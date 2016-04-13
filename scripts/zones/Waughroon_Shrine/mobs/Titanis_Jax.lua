@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Waughroon Shrine
--- NPC:  Titanis_Jax
+--  MOB: Titanis_Jax
 -----------------------------------
 
 
@@ -8,12 +8,12 @@
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

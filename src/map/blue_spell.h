@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ class CBlueSpell : public CSpell
 public:
 
     CBlueSpell(uint16 id);
+    virtual std::unique_ptr<CSpell> clone() override;
 
     uint16		getMonsterSkillId();
     uint8       getSetPoints();

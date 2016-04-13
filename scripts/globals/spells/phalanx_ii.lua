@@ -11,7 +11,7 @@ require("scripts/globals/magic");
 -- OnSpellCast
 -----------------------------------------
 
-function OnMagicCastingCheck(caster,target,spell)
+function onMagicCastingCheck(caster,target,spell)
     return 0;
 end;
 
@@ -28,11 +28,11 @@ function onSpellCast(caster,target,spell)
 
     final = (enhskill / 25) + merits + 1;
 
-    if(final>35) then
+    if (final>35) then
         final = 35;
     end
 
-    if(target:addStatusEffect(EFFECT_PHALANX,final,0,duration)) then
+    if (target:addStatusEffect(EFFECT_PHALANX,final,0,duration)) then
         spell:setMsg(230);
     else
         spell:setMsg(75);

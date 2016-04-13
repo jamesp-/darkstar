@@ -29,19 +29,21 @@ end;
 function onTrigger(player,npc)
 
 local CurrentMission = player:getCurrentMission(WINDURST);
-local WindyKills = player:getVar("Windurst_7-1Kills");
 local npcId = npc:getID();
-
-	if(npcId == 17469825) then
-		if(CurrentMission == THE_SIXTH_MINISTRY and WindyKills == 4 and MissionStatus == 1) then
-			player:startEvent(0x0045);
-		end
-				
-	else
-		local cs = math.random(0x041,0x044);
-		player:startEvent(cs);
-		
-	end
+    
+    if (npcId == 17469828) then
+            if (CurrentMission == THE_SIXTH_MINISTRY and player:getVar("MissionStatus") == 1) then
+        player:startEvent(0x0045);
+        end
+    elseif (npcId == 17469824) then
+        player:startEvent(0x0041);
+    elseif (npcId == 17469825) then
+        player:startEvent(0x0042);
+    elseif (npcId == 17469826) then
+        player:startEvent(0x0043);        
+    elseif (npcId == 17469827) then
+        player:startEvent(0x0044);        
+    end
 end;
 
 -----------------------------------
@@ -62,7 +64,7 @@ function onEventFinish(player,csid,option)
 --printf("CSID: %u",csid);
 --printf("RESULT: %u",option);
 
-	if (csid == 0x0045) then
-		player:setVar("MissionStatus",2);
-	end
+    if (csid == 0x0045) then
+        player:setVar("MissionStatus",2);
+    end
 end;

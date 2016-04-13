@@ -1,15 +1,17 @@
 -----------------------------------
 -- Area: LaLoff Amphitheater
--- NPC:  Ark Angel's Wyvern
+--  MOB: Ark Angel's Wyvern
 -----------------------------------
-
+package.loaded["scripts/zones/LaLoff_Amphitheater/TextIDs"] = nil;
+-----------------------------------
 require("scripts/zones/LaLoff_Amphitheater/TextIDs");
+require("scripts/globals/status");
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
@@ -20,7 +22,7 @@ function onMobEngaged(mob,target)
    local mobid = mob:getID()
 
    for member = mobid-7, mobid do
-      if (GetMobAction(member) == 16) then 
+      if (GetMobAction(member) == 16) then
          GetMobByID(member):updateEnmity(target);
       end
    end
@@ -37,5 +39,5 @@ end;
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

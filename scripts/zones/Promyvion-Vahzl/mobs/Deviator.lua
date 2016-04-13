@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Promyvion vahzl
--- NPC:  Deviator
+--  MOB: Deviator
 -----------------------------------
 
 
@@ -8,13 +8,20 @@
 -- onMobSpawn
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	GetNPCByID(16867687):hideNPC(900); -- 15m Hide Time?, qm1
+function onMobDeath(mob, killer, ally)
+end;
+
+-----------------------------------
+-- onMobDespawn
+-----------------------------------
+
+function onMobDespawn(mob)
+    GetNPCByID(16867687):updateNPCHideTime(FORCE_SPAWN_QM_RESET_TIME);
 end;

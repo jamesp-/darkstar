@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,14 +33,12 @@
 
 namespace attackutils
 {
-	uint8				getHitCount(uint8 hits);		// The multihit calculator.
-	uint32				CheckForDamageMultiplier(CCharEntity* PChar, CItemWeapon* PWeapon, uint32 damage, PHYSICAL_ATTACK_TYPE attackType);
-	
-	bool				IsParried(CBattleEntity*, CBattleEntity*);		// Is the attack parried.
-	bool				IsGuarded(CBattleEntity*, CBattleEntity*);		// Is the attack guarded.
-	bool				IsBlocked(CBattleEntity*, CBattleEntity*);		// Is the attack blocked.
-	void				TryAbsorbMPfromPhysicalAttack(CBattleEntity* battleEntity, uint32 damage);
-	bool				TryAbsorbHPfromPhysicalAttack(CBattleEntity* battleEntity, uint32 damage);
+    uint8				getHitCount(uint8 hits);		// The multihit calculator.
+    uint32				CheckForDamageMultiplier(CCharEntity* PChar, CItemWeapon* PWeapon, uint32 damage, PHYSICAL_ATTACK_TYPE attackType);
+
+    bool				IsParried(CBattleEntity* PAttacker, CBattleEntity* PDefender);		// Is the attack parried.
+    bool				IsGuarded(CBattleEntity* PAttacker, CBattleEntity* PDefender);		// Is the attack guarded.
+    bool				IsBlocked(CBattleEntity* PAttacker, CBattleEntity* PDefender);		// Is the attack blocked.
 };
 
 #endif

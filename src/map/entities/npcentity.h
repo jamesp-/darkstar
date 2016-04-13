@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -29,19 +29,29 @@
 
 #include "baseentity.h"
 
-int32 close_door(uint32 tick,CTaskMgr::CTask *PTask); // закрываем дверь
-int32 open_door(uint32 tick,CTaskMgr::CTask *PTask);
-int32 disappear_npc(uint32 tick,CTaskMgr::CTask *PTask); // Used for showNPC lua function
-int32 reappear_npc(uint32 tick,CTaskMgr::CTask *PTask); // used for hideNPC lua function
+int32 close_door(time_point tick,CTaskMgr::CTask *PTask); // закрываем дверь
+int32 open_door(time_point tick,CTaskMgr::CTask *PTask);
+int32 disappear_npc(time_point tick,CTaskMgr::CTask *PTask); // Used for showNPC lua function
+int32 reappear_npc(time_point tick,CTaskMgr::CTask *PTask); // used for hideNPC lua function
 
 class CNpcEntity : public CBaseEntity {
 public:
 
-	uint32		unknown;
-	uint8		name_prefix;
+    uint32      m_flags;
+    uint8       name_prefix;
+    void        HideModel(bool hide);                    // hide / show model
+    bool        IsModelHidden();
+    void        HideHP(bool hide);
+    bool        IsHPHidden();
+    void        Untargetable(bool untargetable);
+    bool        IsUntargetable();
+    virtual void PostTick() override;
+    virtual void Tick(time_point) override {}
 
 	 CNpcEntity();				// конструктор
 	~CNpcEntity();				// деструктор
+
+
 private:
 };
 

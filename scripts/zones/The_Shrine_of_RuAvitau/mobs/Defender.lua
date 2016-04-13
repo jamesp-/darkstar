@@ -1,7 +1,9 @@
 -----------------------------------
 -- Area: The Shrine of Ru'Avitau
--- MOB:  Defender
+--  MOB: Defender
 -----------------------------------
+
+require("scripts/globals/groundsofvalor");
 
 -----------------------------------
 -- onMobInitialize Action
@@ -14,10 +16,10 @@ end;
 -- onMobSpawn
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 
     local Defender = mob:getID();
-    GetMobByID(Defender):setExtraVar(1);
+    GetMobByID(Defender):setLocalVar("1",1);
 
 end;
 
@@ -29,7 +31,7 @@ function onMobFight(mob,target)
 
     local Defender = mob:getID();
     local AuraGear = Defender + 1;
-    local ExtraVar = GetMobByID(Defender):getExtraVar(1);
+    local ExtraVar = GetMobByID(Defender):getLocalVar("1");
 
    -- Summons a Defender every 15 seconds.
    -- TODO: Casting animation for before summons. When he spawns them isn't exactly retail accurate.
@@ -44,7 +46,7 @@ function onMobFight(mob,target)
             if (GetMobAction(AuraGear) == 0) then
                 SpawnMob(AuraGear):updateEnmity(target);
                 GetMobByID(AuraGear):setPos(GetMobByID(Defender):getXPos()+1, GetMobByID(Defender):getYPos(), GetMobByID(Defender):getZPos()+1); -- Set AuraGear x and z position +1 from Defender
-                GetMobByID(Defender):setExtraVar(ExtraVar+1);
+                GetMobByID(Defender):setLocalVar("1",ExtraVar+1);
                 return;
             end
         end
@@ -61,7 +63,7 @@ function onMobDisengage(mob)
     local Defender = mob:getID();
     local AuraGear = mob:getID() + 1;
 
-    GetMobByID(Defender):setExtraVar(0);
+    GetMobByID(Defender):resetLocalVars();
 
     if (GetMobAction(AuraGear) ~= 0) then
         DespawnMob(AuraGear);
@@ -73,14 +75,14 @@ end;
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
+function onMobDeath(mob, killer, ally)
 
-    checkGoVregime(killer,mob,749,1);
+    checkGoVregime(ally,mob,749,1);
 
     local Defender = mob:getID();
     local AuraGear = mob:getID() + 1;
 
-    GetMobByID(Defender):setExtraVar(0);
+    GetMobByID(Defender):resetLocalVars();
 
     if (GetMobAction(AuraGear) ~= 0) then
         DespawnMob(AuraGear);
@@ -96,7 +98,7 @@ function onMobDespawn( mob )
     local Defender = mob:getID();
     local AuraGear = mob:getID() + 1;
 
-    GetMobByID(Defender):setExtraVar(0);
+    GetMobByID(Defender):resetLocalVars();
 
     if (GetMobAction(AuraGear) ~= 0) then
         DespawnMob(AuraGear);

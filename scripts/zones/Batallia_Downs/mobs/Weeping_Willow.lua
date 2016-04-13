@@ -1,15 +1,13 @@
 -----------------------------------
 -- Area: Batallia Downs
--- NPC:  Weeping Willow
+--  MOB: Weeping Willow
 -----------------------------------
-
-require("scripts/globals/titles");
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
@@ -17,30 +15,22 @@ end;
 -----------------------------------
 
 function onMobFight(mob,target)
-	if(mob:getHP() <= mob:getMaxHP()/2 and GetServerVariable("NM-SpecialWeepWillowSapSpawn") < 1) then
-		SpawnMob(17207303,600):updateEnmity(target);
-		SpawnMob(17207304,600):updateEnmity(target);
-		SpawnMob(17207305,600):updateEnmity(target);
-		SpawnMob(17207306,600):updateEnmity(target);
-		SpawnMob(17207307,600):updateEnmity(target);
-		SetServerVariable("NM-SpecialWeepWillowSapSpawn",1);
-	end
+    if (mob:getHPP() <= 50 and mob:getLocalVar("Saplings") < 1) then
+        SpawnMob(mob:getID()+1):updateEnmity(target);
+        SpawnMob(mob:getID()+2):updateEnmity(target);
+        SpawnMob(mob:getID()+3):updateEnmity(target);
+        SpawnMob(mob:getID()+4):updateEnmity(target);
+        SpawnMob(mob:getID()+5):updateEnmity(target);
+        mob:setLocalVar("Saplings", 1);
+    end
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	SpawnMob(17207308,600):updateEnmity(killer);
-	SetServerVariable("NM-SpecialWeepWillowSapSpawn",0);
-end;
-
-
------------------------------------
--- onMobDespawn
------------------------------------
-
-function OnMobDespawn(mob)
-	SetServerVariable("[NM-Special]WeepWillowSapSpawn",0);
+function onMobDeath(mob, killer, ally)
+    local JACK = mob:getID()+6;
+    SpawnMob(JACK):updateEnmity(killer);
+    GetMobByID(JACK):setPos( mob:getXPos(), mob:getYPos(), mob:getZPos(), 0);
 end;

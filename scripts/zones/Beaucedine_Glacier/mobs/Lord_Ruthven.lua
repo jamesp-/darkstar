@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Beaucedine Glacier
--- NPC:  Lord Ruthven
+--  MOB: Lord Ruthven
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(RUTHVEN_ENTOMBER);
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(RUTHVEN_ENTOMBER);
 end;

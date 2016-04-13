@@ -1,27 +1,24 @@
-
 -----------------------------------
--- mob : Gigas Wrestler
--- zone : Lufaise_Meadows 
+-- Area: Lufaise_Meadows
+--  MOB: Gigas Wrestler
 -----------------------------------
-
-
 
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
+function onMobDeath(mob, killer, ally)
+    local kills = ally:getVar("FOMOR_HATE");
 
-	local kills = killer:getVar("FOMOR_HATE");
-	if(kills > 0) then
-		killer:setVar("FOMOR_HATE",kills -1);
-	end
+    if (kills > 0) then
+        ally:setVar("FOMOR_HATE",kills -1);
+    end
 end;

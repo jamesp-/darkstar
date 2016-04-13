@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@
 #include "../entities/charentity.h"
 #include "../conquest_system.h"
 
-#include "../ai/ai_char_normal.h"
-#include "../ai/ai_char_prisoner.h"
+#include "../ai/ai_container.h"
+#include "../ai/controllers/player_controller.h"
 
 /************************************************************************
 *                                                                       *
@@ -60,8 +60,7 @@ namespace jailutils
 
     void Add(CCharEntity* PChar)
     {
-        delete PChar->PBattleAI;
-        PChar->PBattleAI = new CAICharPrisoner(PChar);
+        PChar->PAI->SetController(nullptr);
 
         // TODO:
     }
@@ -74,8 +73,7 @@ namespace jailutils
 
     void Del(CCharEntity* PChar)
     {
-        delete PChar->PBattleAI;
-        PChar->PBattleAI = new CAICharNormal(PChar);
+        PChar->PAI->SetController(std::make_unique<CPlayerController>(PChar));
 
         // TODO:
     }

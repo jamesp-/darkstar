@@ -4,21 +4,21 @@
 -- 100% TP: ??? / 200% TP: ??? / 300% TP: ???
 ---------------------------------------------------
 
-require("/scripts/globals/settings");
-require("/scripts/globals/status");
-require("/scripts/globals/monstertpmoves");
+require("scripts/globals/settings");
+require("scripts/globals/status");
+require("scripts/globals/monstertpmoves");
 
 ---------------------------------------------------
 
-function OnMobSkillCheck(target,mob,skill)
-    if(mob:AnimationSub() == 1) then
-		return 1;
-	else
-		return 0;
-	end
+function onMobSkillCheck(target,mob,skill)
+    if (mob:AnimationSub() == 1) then
+        return 1;
+    else
+        return 0;
+    end
 end;
 
-function OnMobWeaponSkill(target, mob, skill)
+function onMobWeaponSkill(target, mob, skill)
     local numhits = 1;
     local accmod = 1;
     local dmgmod = 2.7;

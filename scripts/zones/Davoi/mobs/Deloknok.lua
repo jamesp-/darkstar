@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Davoi
--- NPC:  Deloknok
+--  MOB: Deloknok
 -- Involved in Quest: The First Meeting
 -----------------------------------
 
@@ -11,20 +11,20 @@ require("scripts/globals/quests");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	
-	local theFirstMeeting = killer:getQuestStatus(BASTOK,THE_FIRST_MEETING);
-	local martialArtsScroll = killer:hasKeyItem(SANDORIAN_MARTIAL_ARTS_SCROLL);
-	
-	if(theFirstMeeting == QUEST_ACCEPTED and martialArtsScroll == false) then
-		killer:setVar("theFirstMeetingKilledNM",killer:getVar("theFirstMeetingKilledNM") + 1);
-	end
-	
+function onMobDeath(mob, killer, ally)
+
+    local theFirstMeeting = ally:getQuestStatus(BASTOK,THE_FIRST_MEETING);
+    local martialArtsScroll = ally:hasKeyItem(SANDORIAN_MARTIAL_ARTS_SCROLL);
+
+    if (theFirstMeeting == QUEST_ACCEPTED and martialArtsScroll == false) then
+        ally:setVar("theFirstMeetingKilledNM",ally:getVar("theFirstMeetingKilledNM") + 1);
+    end
+
 end;

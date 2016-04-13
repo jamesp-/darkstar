@@ -9,27 +9,27 @@ require("scripts/globals/magic");
 -- OnSpellCast
 -----------------------------------------
 
-function OnMagicCastingCheck(caster,target,spell)
-	return 0;
+function onMagicCastingCheck(caster,target,spell)
+    return 0;
 end;
 
 function onSpellCast(caster,target,spell)
+    local dMND = (caster:getStat(MOD_MND) - target:getStat(MOD_MND));
+    local resist = applyResistanceEffect(caster,spell,target,dMND,DIVINE_MAGIC_SKILL,0,EFFECT_SLEEP_II);
+    if (resist < 0.5) then
+        spell:setMsg(85); -- Resist
+        return EFFECT_SLEEP_II;
+    end
 
-	local bonus = AffinityBonus(caster, spell:getElement());
-	local dINT = (caster:getStat(MOD_INT) - target:getStat(MOD_INT));
-	local resist = applyResistance(caster,spell,target,dINT,37,bonus);
-	if(resist < 0.5) then
-		spell:setMsg(85); -- Resist
-		return EFFECT_SLEEP_II;
-	end
+    if (target:addStatusEffect(EFFECT_SLEEP_II,2,0,90*resist)) then
+        spell:setMsg(237);
+    else
+        spell:setMsg(75); -- No effect
+    end
 
-	if(target:addStatusEffect(EFFECT_SLEEP_II,2,0,90*resist)) then
-		spell:setMsg(237);
-	else
-		spell:setMsg(75); -- No effect
-	end
+    if (caster:isPC()) then
+        target:updateEnmity(caster,320,1);
+    end
 
-	target:updateEnmity(caster,320,1);
-	return EFFECT_SLEEP_II;
-
+    return EFFECT_SLEEP_II;
 end;

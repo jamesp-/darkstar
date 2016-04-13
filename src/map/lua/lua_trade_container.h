@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,34 +27,32 @@
 #include "../../common/cbasetypes.h"
 #include "../../common/lua/lunar.h"
 
-#include "../trade_container.h"
-
-
+class CTradeContainer;
 class CLuaTradeContainer
 {
-	CTradeContainer *m_pMyTradeContainer;
+    CTradeContainer *m_pMyTradeContainer;
 public:
 
-	static const int8 className[];
-	static Lunar<CLuaTradeContainer>::Register_t methods[];
+    static const int8 className[];
+    static Lunar<CLuaTradeContainer>::Register_t methods[];
 
-	CLuaTradeContainer(lua_State*);
-	CLuaTradeContainer(CTradeContainer*);
+    CLuaTradeContainer(lua_State*);
+    CLuaTradeContainer(CTradeContainer*);
 
-	CTradeContainer* GetTradeContainer()const
-	{
-		return m_pMyTradeContainer;
-	}
+    CTradeContainer* GetTradeContainer()const
+    {
+        return m_pMyTradeContainer;
+    }
 
-	int32 getGil(lua_State*);
-	int32 getItem(lua_State*);
-	int32 getItemSubId(lua_State*);
-	int32 getItemQty(lua_State*);
-	int32 hasItemQty(lua_State*);
-	int32 getSlotQty(lua_State*);		// количество предметов в указанной ячейке
-	int32 getItemCount(lua_State*);		// общее количество предметов
+    int32 getGil(lua_State*);
+    int32 getItem(lua_State*);
+    int32 getItemSubId(lua_State*);
+    int32 getItemQty(lua_State*);
+    int32 hasItemQty(lua_State*);
+    int32 getSlotQty(lua_State*);		// количество предметов в указанной ячейке
+    int32 getItemCount(lua_State*);		// общее количество предметов
     int32 getSlotCount(lua_State*);
-	int32 confirmItem(lua_State*);
+    int32 confirmItem(lua_State*);
 };
 
 #endif

@@ -5,30 +5,30 @@
 --  Type: Enfeebling
 --  Utsusemi/Blink absorb: Ignores shadows
 ---------------------------------------------
-require("/scripts/globals/settings");
-require("/scripts/globals/status");
-require("/scripts/globals/monstertpmoves");
+require("scripts/globals/settings");
+require("scripts/globals/status");
+require("scripts/globals/monstertpmoves");
 
 ---------------------------------------------
-function OnMobSkillCheck(target,mob,skill)
+function onMobSkillCheck(target,mob,skill)
     return 0;
 end;
 
-function OnMobWeaponSkill(target, mob, skill)
-    local silenced = false;
-    local blinded = false;
+function onMobWeaponSkill(target, mob, skill)
 
-    silenced = MobStatusEffectMove(mob, target, EFFECT_SLOW, 128, 0, 60);
+    local slowed = false;
+    local weight = false;
 
-    blinded = MobStatusEffectMove(mob, target, EFFECT_WEIGHT, 40, 0, 60);
+    slowed = MobStatusEffectMove(mob, target, EFFECT_SLOW, 128, 0, 60);
+    weight = MobStatusEffectMove(mob, target, EFFECT_WEIGHT, 40, 0, 60);
 
     skill:setMsg(MSG_ENFEEB_IS);
 
-    -- display silenced first, else blind
-    if(silenced == MSG_ENFEEB_IS) then
-        typeEffect = EFFECT_SILENCE;
-    elseif(blinded == MSG_ENFEEB_IS) then
-        typeEffect = EFFECT_BLINDNESS;
+    -- display slow first, else weight
+    if (slowed == MSG_ENFEEB_IS) then
+        typeEffect = EFFECT_SLOW;
+    elseif (weight == MSG_ENFEEB_IS) then
+        typeEffect = EFFECT_WEIGHT;
     else
         skill:setMsg(MSG_MISS);
     end

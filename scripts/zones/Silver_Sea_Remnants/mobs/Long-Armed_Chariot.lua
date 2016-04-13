@@ -1,6 +1,6 @@
 -----------------------------------
--- Area: 
--- NPC:  Long-Armed_Chariot
+-- Area:
+--  MOB: Long-Armed_Chariot
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(MOON_CHARIOTEER);
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(MOON_CHARIOTEER);
 end;

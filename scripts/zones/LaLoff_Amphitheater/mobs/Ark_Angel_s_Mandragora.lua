@@ -1,9 +1,11 @@
 -----------------------------------
 -- Area: LaLoff Amphitheater
--- NPC:  Ark Angel's Mandragora
+--  MOB: Ark Angel's Mandragora
 -----------------------------------
-
+package.loaded["scripts/zones/LaLoff_Amphitheater/TextIDs"] = nil;
+-----------------------------------
 require("scripts/zones/LaLoff_Amphitheater/TextIDs");
+require("scripts/globals/status");
 
 -----------------------------------
 
@@ -14,7 +16,7 @@ require("scripts/zones/LaLoff_Amphitheater/TextIDs");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
@@ -25,7 +27,7 @@ function onMobEngaged(mob,target)
    local mobid = mob:getID()
 
    for member = mobid-3, mobid+4 do
-      if (GetMobAction(member) == 16) then 
+      if (GetMobAction(member) == 16) then
          GetMobByID(member):updateEnmity(target);
       end
    end
@@ -42,5 +44,5 @@ end;
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

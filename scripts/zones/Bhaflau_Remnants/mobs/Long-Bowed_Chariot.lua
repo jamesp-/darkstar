@@ -1,6 +1,6 @@
 -----------------------------------
--- Area: 
--- NPC:  Long-Bowed_Chariot
+-- Area:
+--  MOB: Long-Bowed_Chariot
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(COMET_CHARIOTEER);
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(COMET_CHARIOTEER);
 end;

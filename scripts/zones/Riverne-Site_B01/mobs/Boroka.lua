@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Riverne - Site B01
--- NPC:  Boroka
+--  NM:  Boroka
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,14 +9,14 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(BOROKA_BELEAGUERER);
-	mob:setRespawnTime(math.random((75600),(86400))); -- 21-24 hour respawn
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(BOROKA_BELEAGUERER);
+    mob:setRespawnTime(math.random(75600,86400)); -- 21-24 hour respawn
 end;

@@ -5,7 +5,7 @@
 -- Confirmed shop stock, August 2013
 -----------------------------------
 
-require("scripts/globals/harvest_festivals")
+require("scripts/globals/events/harvest_festivals")
 require("scripts/globals/shop");
 require("scripts/globals/conquest");
 package.loaded["scripts/zones/Windurst_Woods/TextIDs"] = nil;
@@ -16,7 +16,7 @@ require("scripts/zones/Windurst_Woods/TextIDs");
 -----------------------------------
 
 function onTrade(player,npc,trade)
-	onHalloweenTrade(player,trade,npc);
+    onHalloweenTrade(player,trade,npc);
 end;
 
 -----------------------------------

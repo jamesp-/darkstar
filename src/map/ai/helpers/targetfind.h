@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-Copyright (c) 2010-2014 Darkstar Dev Teams
+Copyright (c) 2010-2015 Darkstar Dev Teams
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -112,8 +112,9 @@ public:
     bool isWithinArea(position_t* pos);
     bool isWithinCone(position_t* pos);
     bool isWithinRange(position_t* pos, float range);
+    bool canSee(position_t* point);
 
-    CBattleEntity* getValidTarget(uint16 actionTargetID, uint8 validTargetFlags);
+    CBattleEntity* getValidTarget(uint16 actionTargetID, uint16 validTargetFlags);
 
     std::vector<CBattleEntity*> m_targets; // contains all found entities
 

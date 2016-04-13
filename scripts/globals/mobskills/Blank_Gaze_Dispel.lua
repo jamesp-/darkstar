@@ -5,23 +5,23 @@
 -- Range: Melee?
 ---------------------------------------------------
 
-require("/scripts/globals/settings");
-require("/scripts/globals/status");
-require("/scripts/globals/monstertpmoves");
+require("scripts/globals/settings");
+require("scripts/globals/status");
+require("scripts/globals/monstertpmoves");
 
 ---------------------------------------------------
 
-function OnMobSkillCheck(target,mob,skill)
+function onMobSkillCheck(target,mob,skill)
     return 0;
 end;
 
-function OnMobWeaponSkill(target, mob, skill)
+function onMobWeaponSkill(target, mob, skill)
     local effect = 0;
-    if(target:isFacing(mob)) then
+    if (target:isFacing(mob)) then
 
         effect = target:dispelStatusEffect();
 
-        if(effect == EFFECT_NONE) then
+        if (effect == EFFECT_NONE) then
             skill:setMsg(MSG_NO_EFFECT); -- no effect
         else
             skill:setMsg(MSG_DISAPPEAR);

@@ -1,4 +1,4 @@
------------------------------------     
+-----------------------------------
 -- Torcleaver
 -- Skill Level: N/A
 -- Description: Deals triple damage. Damage varies with TP. Caladbolg: Aftermath.
@@ -9,26 +9,31 @@
 -- Skillchain Properties: Light/Distortion
 -- Modifiers: VIT:60%
 -- Damage Multipliers by TP:
--- 100%TP	200%TP	300%TP
--- 4.75	    5.75	6.5
+-- 100%TP    200%TP    300%TP
+-- 4.75        5.75    6.5
+-----------------------------------
+require("scripts/globals/status");
+require("scripts/globals/settings");
+require("scripts/globals/weaponskills");
+-----------------------------------
 
------------------------------------        
-require("scripts/globals/status");      
-require("scripts/globals/settings");    
-require("scripts/globals/weaponskills");        
------------------------------------     
+function onUseWeaponSkill(player, target, wsID, tp, primary)
 
-function OnUseWeaponSkill(player, target, wsID) 
-	
-	local params = {};
-	params.numHits = 1;
-	params.ftp100 = 4.75; params.ftp200 = 5.75; params.ftp300 = 6.5;
-	params.str_wsc = 0.0; params.dex_wsc = 0.0; params.vit_wsc = 0.6; params.agi_wsc = 0.0; params.int_wsc = 0.0; params.mnd_wsc = 0.0; params.chr_wsc = 0.0;
-	params.crit100 = 0.00; params.crit200 = 0.00; params.crit300 = 0.00;
-	params.canCrit = false;
-	params.acc100 = 0.0; params.acc200= 0.0; params.acc300= 0.0;
-	params.atkmulti = 1;
-	local damage, criticalHit, tpHits, extraHits = doPhysicalWeaponskill(player, target, params);        
-	return tpHits, extraHits, criticalHit, damage;
-	
-end     
+    local params = {};
+    params.numHits = 1;
+    params.ftp100 = 4.75; params.ftp200 = 5.75; params.ftp300 = 6.5;
+    params.str_wsc = 0.0; params.dex_wsc = 0.0; params.vit_wsc = 0.6; params.agi_wsc = 0.0; params.int_wsc = 0.0; params.mnd_wsc = 0.0; params.chr_wsc = 0.0;
+    params.crit100 = 0.00; params.crit200 = 0.00; params.crit300 = 0.00;
+    params.canCrit = false;
+    params.acc100 = 0.0; params.acc200= 0.0; params.acc300= 0.0;
+    params.atkmulti = 1;
+
+    if (USE_ADOULIN_WEAPON_SKILL_CHANGES == true) then
+        params.ftp100 = 4.75; params.ftp200 = 7.5; params.ftp300 = 9.6875;
+        params.vit_wsc = 0.8;
+    end
+
+    local damage, criticalHit, tpHits, extraHits = doPhysicalWeaponskill(player, target, wsID, params, tp, primary);
+    return tpHits, extraHits, criticalHit, damage;
+
+end

@@ -1,10 +1,15 @@
 -----------------------------------
 -- Area: LaLoff Amphitheater
--- NPC:  Ark Angel EV
+--  MOB: Ark Angel EV
 -----------------------------------
-
-require("scripts/globals/status");
+package.loaded["scripts/zones/LaLoff_Amphitheater/TextIDs"] = nil;
+-----------------------------------
 require("scripts/zones/LaLoff_Amphitheater/TextIDs");
+require("scripts/globals/status");
+
+-----------------------------------
+-- onMobInitialize Action
+-----------------------------------
 
 function onMobInitialize(mob)
     mob:addMod(MOD_REGAIN, 50);
@@ -14,7 +19,7 @@ end;
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
@@ -25,13 +30,13 @@ function onMobEngaged(mob,target)
     local mobid = mob:getID()
 
     for member = mobid-4, mobid+3 do
-        if (GetMobAction(member) == 16) then 
+        if (GetMobAction(member) == 16) then
             GetMobByID(member):updateEnmity(target);
         end
     end
-    
+
     local hp = math.random(40,60)
-    mob:setExtraVar(0, hp);
+    mob:setLocalVar("Benediction", hp);
 end;
 
 -----------------------------------
@@ -39,22 +44,23 @@ end;
 -----------------------------------
 function onMobFight(mob,target)
 
-	local battletime = mob:getBattleTime();
-	local invtime, bhp = mob:getExtraVar(2);
-	
-	if (battletime > invtime + 150) then
-		mob:useMobAbility(438);
-		mob:setExtraVar(battletime, bhp);
-	elseif (mob:getHPP() < bhp) then
-		mob:useMobAbility(433);
-		mob:setExtraVar(invtime, 0);
-	end
-        
+    local battletime = mob:getBattleTime();
+    local invtime = mob:getLocalVar("Invincible");
+    local bhp = mob:getLocalVar("Benediction");
+
+    if (battletime > invtime + 150) then
+        mob:useMobAbility(694);
+        mob:setLocalVar("Invincible", battletime);
+    elseif (mob:getHPP() < bhp) then
+        mob:useMobAbility(689);
+        mob:setLocalVar("Benediction", 0);
+    end
+
 end;
 
 -----------------------------------
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

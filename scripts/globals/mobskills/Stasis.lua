@@ -7,27 +7,26 @@
 --  Range: 10' radial
 --  Notes:
 ---------------------------------------------
-require("/scripts/globals/settings");
-require("/scripts/globals/status");
-require("/scripts/globals/monstertpmoves");
+require("scripts/globals/settings");
+require("scripts/globals/status");
+require("scripts/globals/monstertpmoves");
 
 ---------------------------------------------
-function OnMobSkillCheck(target,mob,skill)
+function onMobSkillCheck(target,mob,skill)
     return 0;
 end;
 
-function OnMobWeaponSkill(target, mob, skill)
-	local shadows = MOBPARAM_1_SHADOW;
-	local dmg = MobFinalAdjustments(10,mob,skill,target,MOBSKILL_PHYSICAL,MOBPARAM_BLUNT,shadows);
+function onMobWeaponSkill(target, mob, skill)
+    local shadows = MOBPARAM_1_SHADOW;
+    local dmg = MobFinalAdjustments(10,mob,skill,target,MOBSKILL_PHYSICAL,MOBPARAM_BLUNT,shadows);
 
-	local typeEffect = EFFECT_PARALYSIS;
+    local typeEffect = EFFECT_PARALYSIS;
 
-    mob:resetEnmity(target);
+        mob:resetEnmity(target);
 
-    if(MobPhysicalHit(skill)) then
-        target:addStatusEffect(typeEffect,40,0,60);
-        skill:setMsg(MSG_ENFEEB_IS);
-		return typeEffect;
+    if (MobPhysicalHit(skill)) then
+        skill:setMsg(MobStatusEffectMove(mob, target, typeEffect, 40, 0, 60));
+        return typeEffect;
     end
 
     return shadows;

@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -31,6 +31,11 @@ CBlueSpell::CBlueSpell(uint16 id) : CSpell(id)
     m_traitCategory  = 0;
     m_traitWeight    = 0;
 }
+
+  std::unique_ptr<CSpell> CBlueSpell::clone()
+  {
+      return std::unique_ptr<CBlueSpell>(new CBlueSpell(*this));
+  }
 
 uint16 CBlueSpell::getMonsterSkillId()
 {
@@ -106,4 +111,3 @@ void CBlueSpell::addModifier(CModifier* modifier)
 {
     modList.push_back(modifier);
 }
-

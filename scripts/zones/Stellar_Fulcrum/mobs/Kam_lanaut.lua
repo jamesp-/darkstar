@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Stellar Fulcrum
--- NPC:  Kam'lanaut
+--  MOB: Kam'lanaut
 -- Zilart Mission 8 BCNM Fight
 -----------------------------------
 
@@ -8,20 +8,26 @@ require("scripts/globals/titles");
 require("scripts/globals/status");
 require("scripts/globals/magic");
 
-local blades = {567, 570, 572, 569, 568, 571};
+local blades = {823, 826, 828, 825, 824, 827};
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
+
+-----------------------------------
+-- onMobFight Action
+-----------------------------------
 
 function onMobFight(mob, target)
 
-    local changeTime, element = mob:getExtraVar(2);
+    local changeTime = mob:getLocalVar("changeTime");
+    local element = mob:getLocalVar("element");
+
     if (changeTime == 0) then
-        mob:setExtraVar(math.random(1,3)*15, element)
+        mob:setLocalVar("changeTime",math.random(1,3)*15)
         return;
     end
     if (mob:getBattleTime() >= changeTime) then
@@ -34,7 +40,8 @@ function onMobFight(mob, target)
         end
         mob:useMobAbility(blades[newelement]);
         mob:addMod(absorbMod[newelement], 100);
-        mob:setExtraVar(mob:getBattleTime() + math.random(1,3)*15, newelement);
+        mob:setLocalVar("changeTime", mob:getBattleTime() + math.random(1,3)*15);
+        mob:setLocalVar("element", newelement);
     end
 end;
 
@@ -42,6 +49,6 @@ end;
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob,killer)
-	killer:addTitle(DESTROYER_OF_ANTIQUITY);
+function onMobDeath(mob,killer,ally)
+    ally:addTitle(DESTROYER_OF_ANTIQUITY);
 end;

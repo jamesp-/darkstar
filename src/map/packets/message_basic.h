@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -43,8 +43,8 @@ enum MSGBASIC_ID : uint16
 	MSGBASIC_UNABLE_TO_USE_JA2		= 88, /* Unable to use job ability. */
 	MSGBASIC_IS_PARALYZED			= 29, /* The <player> is paralyzed. */
 	MSGBASIC_SHADOW_ABSORB			= 31, /* .. of <target>'s shadows absorb the damage and disappear. */
-	MSGBASIC_NOT_ENOUGH_MP			= 34, /* The <player> does not have enough MP to cast (NULL). */
-	MSGBASIC_NO_NINJA_TOOLS			= 35, /* The <player> lacks the ninja tools to cast (NULL). */
+	MSGBASIC_NOT_ENOUGH_MP			= 34, /* The <player> does not have enough MP to cast (nullptr). */
+	MSGBASIC_NO_NINJA_TOOLS			= 35, /* The <player> lacks the ninja tools to cast (nullptr). */
     MSGBASIC_CANNOT_CAST_SPELL      = 47, /* >player> cannot cast <spell>. */
     MSGBASIC_CANNOT_USE_IN_AREA      = 40, /* cannot use in this area */
 	MSGBASIC_UNABLE_TO_CAST_SPELLS  = 49, /* The <player> is unable to cast spells. */
@@ -54,6 +54,7 @@ enum MSGBASIC_ID : uint16
 	MSGBASIC_USES_RECOVERS_HP		= 102, /* The <player> uses .. <target> recovers .. HP. */
 	MSGBASIC_USES_JA_TAKE_DAMAGE	= 317, /* The <player> uses .. <target> takes .. points of damage. */
 	MSGBASIC_IS_INTIMIDATED			= 106, /* The <player> is intimidated by <target>'s presence. */
+	MSGBASIC_CANNOT_PERFORM_ACTION	= 71, /* You cannot perform that action on the specified target. */
 	MSGBASIC_CANNOT_ON_THAT_TARG	= 155, /* You cannot perform that action on the specified target. */
 	MSGBASIC_OUT_OF_RANGE_UNABLE_CAST	= 313, /* Out of range unable to cast */
 	MSGBASIC_CANNOT_ATTACK_TARGET	= 446, /* You cannot attack that target */
@@ -67,7 +68,9 @@ enum MSGBASIC_ID : uint16
 	MSGBASIC_LOSE_SIGHT				= 36, /* You lose sight of <target>. */
 	MSGBASIC_TOO_FAR_AWAY			= 78, /* <target> is too far away. */
 	/* Weaponskills */
+    MSGBASIC_UNABLE_TO_USE_WS       = 89,  /* Unable to use weaponskill. */
 	MSGBASIC_CANNOT_USE_WS			= 190, /* The <player> cannot use that weapon ability. */
+    MSGBASIC_CANNOT_USE_ANY_WS      = 191, /* The <player> is unable to use weapon skills. */
 	MSGBASIC_NOT_ENOUGH_TP			= 192, /* The <player> does not have enough TP. */
 	/* Pets */
 	MSGBASIC_REQUIRES_A_PET			= 215, /* That action requires a pet. */
@@ -92,8 +95,15 @@ enum MSGBASIC_ID : uint16
 	MSGBASIC_DIFFICULT_TO_CHARM		= 212, /* It would be difficult for the <player> to charm <target>. */
 	MSGBASIC_MIGHT_BE_ABLE_CHARM	= 213, /* The <player> might be able to charm <target>. */
 	MSGBASIC_SHOULD_BE_ABLE_CHARM	= 214, /* The <player> should be able to charm <target>. */
+    /* Checkparam */
+    MSGBASIC_CHECKPARAM_NAME        = 733,
+    MSGBASIC_CHECKPARAM_ILVL        = 731,
+    MSGBASIC_CHECKPARAM_PRIMARY     = 712,
+    MSGBASIC_CHECKPARAM_AUXILIARY   = 713,
+    MSGBASIC_CHECKPARAM_RANGE       = 714,
+    MSGBASIC_CHECKPARAM_DEFENSE     = 715,
 	/* BLU */
-	MSGBASIC_LEARNS_SPELL			= 419, /* <target> learns (NULL)! */
+	MSGBASIC_LEARNS_SPELL			= 419, /* <target> learns (nullptr)! */
 	/* COR */
 	MSGBASIC_ROLL_MAIN				= 420, /* The <player> uses .. The total comes to ..! <target> receives the effect of .. */
 	MSGBASIC_ROLL_SUB				= 421, /* <target> receives the effect of .. */
@@ -136,6 +146,7 @@ class CMessageBasicPacket : public CBasicPacket
 public:
 
 	CMessageBasicPacket(CBaseEntity* PSender, CBaseEntity* PTarget, int32 param, int32 value, uint16 messageID);
+    uint16 getMessageID();
 };
 
 #endif

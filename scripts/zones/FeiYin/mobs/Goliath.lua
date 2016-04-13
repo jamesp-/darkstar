@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Fei'Yin
--- NM:   Goliath
+--  NM:  Goliath
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,14 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(GOLIATH_KILLER);	
-
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(GOLIATH_KILLER);
 end;

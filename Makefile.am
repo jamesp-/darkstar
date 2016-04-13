@@ -11,13 +11,14 @@ CPPFLAGS_ALL            = $(DARKSTAR_CPPFLAGS)
 CXXFLAGS_ALL            = $(DARKSTAR_CXXFLAGS)
 LIBS_ALL                = $(DARKSTAR_LIBS)
 LDFLAGS_ALL             = $(DARKSTAR_LDFLAGS)
-CXX                     = g++ -std=gnu++0x
+CXX                     = g++ -std=c++1y
 
 CFLAGS_ALL              += $(LUA_CFLAGS)
 CFLAGS_ALL              += $(MYSQL_CFLAGS)
 
 LIBS_ALL                += $(LUA_LIBS)
 LIBS_ALL                += $(MYSQL_LDFLAGS)
+LIBS_ALL                += -lzmq
 
 ## Add Architecture-specific stuff
 if DARKSTAR_ARCH_LINUX

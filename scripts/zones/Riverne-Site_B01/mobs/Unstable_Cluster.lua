@@ -7,13 +7,20 @@
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	GetNPCByID(16896175):hideNPC(900); -- (qm1 in NPC_LIST)
+function onMobDeath(mob, killer, ally)
+end;
+
+-----------------------------------
+-- onMobDespawn
+-----------------------------------
+
+function onMobDespawn(mob)
+    GetNPCByID(16896175):updateNPCHideTime(FORCE_SPAWN_QM_RESET_TIME);
 end;

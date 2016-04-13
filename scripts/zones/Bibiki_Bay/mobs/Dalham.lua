@@ -1,29 +1,29 @@
 -----------------------------------
 -- Area: Bibiki Bay
--- NPC:  Dalham
+--  MOB: Dalham
 -----------------------------------
+
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobFight Action
 -----------------------------------
 
-function onMobFight(mob,target)	
+function onMobFight(mob,target)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	if(killer:getCurrentMission(COP) == CALM_BEFORE_THE_STORM and killer:getVar("COP_Dalham_KILL") == 0)then
-		killer:setVar("COP_Dalham_KILL",1);
-	end
+function onMobDeath(mob, killer, ally)
+    if (ally:getCurrentMission(COP) == CALM_BEFORE_THE_STORM and ally:getVar("COP_Dalham_KILL") == 0) then
+        ally:setVar("COP_Dalham_KILL",1);
+    end
 end;
-

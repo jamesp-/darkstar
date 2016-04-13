@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Horlais Peak
--- NPC:  Dread Dragon
+--  MOB: Dread Dragon
 -- Mission 2-3 BCNM Fight
 -----------------------------------
 
@@ -10,13 +10,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
-	killer:addTitle(DREAD_DRAGON_SLAYER);
+function onMobDeath(mob,killer,ally)
+    ally:addTitle(DREAD_DRAGON_SLAYER);
 end;

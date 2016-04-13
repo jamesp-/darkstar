@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Monastic Cavern
--- NPC:  Bugaboo
+--  MOB: Bugaboo
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-   killer:setVar("circleTime",8); -- Set flag so that final CS will show when you interact with alter again
+function onMobDeath(mob, killer, ally)
+   ally:setVar("circleTime",8); -- Set flag so that final CS will show when you interact with alter again
 end;

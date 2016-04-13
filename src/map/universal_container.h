@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -61,10 +61,12 @@ public:
 	UCONTAINERTYPE	GetType();
 
     void    SetLock();
+	void    UnLock();
     void    SetTarget(uint16 Target);
 	void	SetType(UCONTAINERTYPE Type);
 	bool	SetItem(uint8 slotID, CItem* PItem);
     void    SetSize(uint8 size);
+    void    ClearSlot(uint8 slotID);
 
 	void	Clean();
     bool    IsLocked();

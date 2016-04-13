@@ -1,4 +1,4 @@
-// Copyright (c) 2010-2014 Darkstar Dev Teams
+// Copyright (c) 2010-2015 Darkstar Dev Teams
 
 #ifndef	_SOCKET_H_
 #define _SOCKET_H_
@@ -9,12 +9,13 @@
 
 
 #ifdef WIN32
-#define FD_SETSIZE 1000
+    #define FD_SETSIZE 1000
 	#include <winsock2.h>
 	typedef long in_addr_t;
 #else
 	#include <sys/types.h>
 	#include <sys/socket.h>
+    #include <arpa/inet.h>
 	#include <netinet/in.h>
 	#include <errno.h>
 #endif
@@ -152,7 +153,7 @@ extern time_t stall_time;
 int32 makeConnection(uint32 ip, uint16 port, int32 type);
 
 //Интерфейс функции, обрабатывающей соединения
-int32 do_sockets(fd_set* rfd,int32 next);
+int32 do_sockets(fd_set* rfd,duration next);
 
 //функция, закрывающая сокет
 void do_close(int32 fd);
@@ -242,7 +243,7 @@ extern int32 naddr_;   // # of ip addresses
 
 		uint32 client_addr; // remote client address
 
-		unsigned char *rdata, *wdata;
+		char *rdata, *wdata;
 		size_t max_rdata, max_wdata;
 		size_t rdata_size, wdata_size;
 		size_t rdata_pos;

@@ -1,19 +1,26 @@
 -----------------------------------
 -- Area: The Shrine of Ru'Avitau
--- NPC:  Olla Grande
+--  MOB: Olla Grande
 -----------------------------------
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	GetNPCByID(17506692):hideNPC(900);
+function onMobDeath(mob, killer, ally)
+end;
+
+-----------------------------------
+-- onMobDespawn
+-----------------------------------
+
+function onMobDespawn(mob)
+    GetNPCByID(17506692):updateNPCHideTime(FORCE_SPAWN_QM_RESET_TIME);
 end;

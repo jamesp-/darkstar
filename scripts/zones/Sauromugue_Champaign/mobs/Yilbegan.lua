@@ -1,6 +1,6 @@
 -----------------------------------
--- Area: Sauromugue Champaign	
--- NM:   Yilbegan
+-- Area: Sauromugue Champaign
+--  VNM: Yilbegan
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(YILBEGAN_HIDEFLAYER);
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(YILBEGAN_HIDEFLAYER);
 end;

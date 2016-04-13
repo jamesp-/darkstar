@@ -1,9 +1,15 @@
 -----------------------------------
 -- Area: LaLoff Amphitheater
--- NPC:  Ark Angel TT
+--  MOB: Ark Angel TT
 -----------------------------------
-
+package.loaded["scripts/zones/LaLoff_Amphitheater/TextIDs"] = nil;
+-----------------------------------
 require("scripts/zones/LaLoff_Amphitheater/TextIDs");
+require("scripts/globals/status");
+
+-----------------------------------
+-- onMobInitialize Action
+-----------------------------------
 
 function onMobInitialize(mob)
     mob:addMod(MOD_UFASTCAST, 30);
@@ -15,7 +21,7 @@ end
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
@@ -26,7 +32,7 @@ function onMobEngaged(mob,target)
    local mobid = mob:getID()
 
     for member = mobid-5, mobid+2 do
-        if (GetMobAction(member) == 16) then 
+        if (GetMobAction(member) == 16) then
             GetMobByID(member):updateEnmity(target);
         end
     end
@@ -55,5 +61,5 @@ end;
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

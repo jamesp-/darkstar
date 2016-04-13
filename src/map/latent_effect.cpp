@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@
 
 #include "latent_effect.h"
 #include "entities/charentity.h"
+#include "status_effect_container.h"
+#include "items/item_weapon.h"
 
 CLatentEffect::CLatentEffect(LATENT conditionsId, uint16 conditionsValue, uint8 slot, uint16 modValue, int16 modPower)
 {
@@ -134,7 +136,7 @@ void CLatentEffect::Deactivate()
 
             int16 modPower = GetModPower();
 
-            if (weapon != NULL && (weapon->isType(ITEM_ARMOR) || weapon->isType(ITEM_WEAPON)))
+            if (weapon != nullptr && (weapon->isType(ITEM_ARMOR) || weapon->isType(ITEM_WEAPON)))
             {
                 if (GetModValue() == MOD_ADDITIONAL_EFFECT)
                 {

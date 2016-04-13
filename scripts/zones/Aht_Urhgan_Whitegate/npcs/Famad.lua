@@ -24,7 +24,7 @@ end;
 -----------------------------------
 
 function onTrigger(player,npc)
-	local rank = getMercenaryRank(player);
+    local rank = getMercenaryRank(player);
     local haveimperialIDtag;
     local assaultPoints = player:getAssaultPoint(LEBROS_ASSAULT_POINT);
     
@@ -33,12 +33,12 @@ function onTrigger(player,npc)
     else
         haveimperialIDtag = 0;
     end
-        
-    if (rank > 0) then
-        player:startEvent(275,rank,haveimperialIDtag,assaultPoints,player:getCurrentMission(ASSAULT));
-    else
+    
+--[[    if (rank > 0) then
+        player:startEvent(275,rank,haveimperialIDtag,assaultPoints,player:getCurrentAssault());
+    else]]
         player:startEvent(281); -- no rank
-	end
+    --end
 end;
 
 -----------------------------------
@@ -46,8 +46,8 @@ end;
 -----------------------------------
 
 function onEventUpdate(player,csid,option)
-	-- printf("CSID: %u",csid);
-	-- printf("RESULT: %u",option);
+    -- printf("CSID: %u",csid);
+    -- printf("RESULT: %u",option);
 end;
 
 -----------------------------------
@@ -55,13 +55,13 @@ end;
 -----------------------------------
 
 function onEventFinish(player,csid,option)
-	-- printf("CSID: %u",csid);
-	-- printf("RESULT: %u",option);
+    -- printf("CSID: %u",csid);
+    -- printf("RESULT: %u",option);
     if (csid == 275) then
         local selectiontype = bit.band(option, 0xF);
         if (selectiontype == 1) then
             -- taken assault mission
-            player:addMission(ASSAULT, bit.rshift(option,4));
+            player:addAssault(bit.rshift(option,4));
             player:delKeyItem(IMPERIAL_ARMY_ID_TAG);
             player:addKeyItem(LEBROS_ASSAULT_ORDERS);
             player:messageSpecial(KEYITEM_OBTAINED,LEBROS_ASSAULT_ORDERS);

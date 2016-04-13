@@ -1,31 +1,34 @@
 -----------------------------------
 -- Area: Monastic Cavern
--- NPC:  Overlord Bakgodek
+--  MOB: Overlord Bakgodek
 -----------------------------------
-
-require("scripts/globals/titles");
+package.loaded["scripts/zones/Monastic_Cavern/TextIDs"] = nil;
+-----------------------------------
 require("scripts/zones/Monastic_Cavern/TextIDs");
+require("scripts/globals/titles");
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobEngaged
 -----------------------------------
 
-function OnMobEngaged(mob,target)
--- mob:messagePublic(mob,ORC_KING_ENGAGE);
+function onMobEngaged(mob,target)
+    -- Needs to be zone wide message
+    -- mob:messagePublic(mob,ORC_KING_ENGAGE);
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob,killer)
-		killer:addTitle(OVERLORD_OVERTHROWER);
--- mob:messagePublic(mob,ORC_KING_DEATH);
+function onMobDeath(mob,killer,ally)
+    ally:addTitle(OVERLORD_OVERTHROWER);
+    -- Needs to be zone wide message
+    -- mob:messagePublic(mob,ORC_KING_DEATH);
 end;

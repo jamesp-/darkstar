@@ -24,13 +24,13 @@ require("scripts/zones/Sealions_Den/TextIDs");
 
 --instance 3   @pos 500  56  -810
 
-		 
+         
 -- After registering the BCNM via bcnmRegister(bcnmid)
-function OnBcnmRegister(player,instance)
+function onBcnmRegister(player,instance)
 end;
 
 -- Physically entering the BCNM via bcnmEnter(bcnmid)
-function OnBcnmEnter(player,instance)
+function onBcnmEnter(player,instance)
 end;
 
 -- Leaving the BCNM by every mean possible, given by the LeaveCode
@@ -41,33 +41,33 @@ end;
 -- via bcnmLeave(1) or bcnmLeave(2). LeaveCodes 3 and 4 are called
 -- from the core when a player disconnects or the time limit is up, etc
 
-function OnBcnmLeave(player,instance,leavecode)
+function onBcnmLeave(player,instance,leavecode)
 
-	
-	if(leavecode == 2) then -- play end CS. Need time and battle id for record keeping + storage
-	    player:addExp(1000);
-		if(player:getCurrentMission(COP) == THE_WARRIOR_S_PATH) then
-			player:startEvent(0x7d01,1,1,1,instance:getTimeInside(),1,1,0);				
-			player:setVar("PromathiaStatus",0);
-			player:completeMission(COP,THE_WARRIOR_S_PATH);
-			player:addMission(COP,GARDEN_OF_ANTIQUITY);
-		else
-			player:startEvent(0x7d01,1,1,1,instance:getTimeInside(),1,1,1);		
-		end
-	elseif(leavecode == 4) then
-	       player:startEvent(0x7d02);
+    
+    if (leavecode == 2) then -- play end CS. Need time and battle id for record keeping + storage
+        player:addExp(1000);
+        if (player:getCurrentMission(COP) == THE_WARRIOR_S_PATH) then
+            player:startEvent(0x7d01,1,1,1,instance:getTimeInside(),1,1,0);                
+            player:setVar("PromathiaStatus",0);
+            player:completeMission(COP,THE_WARRIOR_S_PATH);
+            player:addMission(COP,GARDEN_OF_ANTIQUITY);
+        else
+            player:startEvent(0x7d01,1,1,1,instance:getTimeInside(),1,1,1);        
+        end
+    elseif (leavecode == 4) then
+           player:startEvent(0x7d02);
    end
-	
+    
 end;
 
 function onEventUpdate(player,csid,option)
 -- print("bc update csid "..csid.." and option "..option);
 end;
-	
+    
 function onEventFinish(player,csid,option)
--- print("bc finish csid "..csid.." and option "..option);	
-    if(csid == 0x7d01)then
-	   player:setPos(-25,-1 ,-620 ,208 ,33);-- al'taieu
-	   player:addTitle(THE_CHEBUKKIS_WORST_NIGHTMARE);
-	end
+-- print("bc finish csid "..csid.." and option "..option);    
+    if (csid == 0x7d01) then
+       player:setPos(-25,-1 ,-620 ,208 ,33);-- al'taieu
+       player:addTitle(THE_CHEBUKKIS_WORST_NIGHTMARE);
+    end
 end;

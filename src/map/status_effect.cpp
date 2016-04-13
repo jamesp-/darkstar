@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 
 #include "entities/battleentity.h"
 #include "status_effect.h"
+#include "status_effect_container.h"
 
 
 CStatusEffect::CStatusEffect(EFFECT id, uint16 icon, uint16 power, uint32 tick, uint32 duration, uint32 subid, uint16 subPower, uint16 tier)
@@ -39,7 +40,7 @@ CStatusEffect::CStatusEffect(EFFECT id, uint16 icon, uint16 power, uint32 tick, 
 	m_Flag	   = EFFECTFLAG_NONE;
 	m_TickTime = tick * 1000;
 	m_Duration = duration * 1000;
-    m_POwner = NULL;
+    m_POwner = nullptr;
 }
 
 CStatusEffect::~CStatusEffect()
@@ -100,7 +101,7 @@ uint16 CStatusEffect::GetTier()
     return m_Tier;
 }
 
-uint16 CStatusEffect::GetFlag()
+uint32 CStatusEffect::GetFlag()
 {
 	return m_Flag;
 }
@@ -115,24 +116,29 @@ uint32 CStatusEffect::GetDuration()
 	return m_Duration;
 }
 
-uint32 CStatusEffect::GetStartTime()
+time_point CStatusEffect::GetStartTime()
 {
 	return m_StartTime;
 }
 
-uint32 CStatusEffect::GetLastTick()
+time_point CStatusEffect::GetLastTick()
 {
 	return m_LastTick;
 }
 
-void CStatusEffect::SetFlag(uint16 Flag)
+void CStatusEffect::SetFlag(uint32 Flag)
 {
     m_Flag |= Flag;
 }
 
+void CStatusEffect::UnsetFlag(uint32 flag)
+{
+    m_Flag &= ~flag;
+}
+
 void CStatusEffect::SetIcon(uint16 Icon)
 {
-    DSP_DEBUG_BREAK_IF(m_POwner == NULL);
+    DSP_DEBUG_BREAK_IF(m_POwner == nullptr);
 
 	m_Icon = Icon;
     m_POwner->StatusEffectContainer->UpdateStatusIcons();
@@ -163,13 +169,13 @@ void CStatusEffect::SetDuration(uint32 Duration)
 	m_Duration = Duration;
 }
 
-void CStatusEffect::SetStartTime(uint32 StartTime)
+void CStatusEffect::SetStartTime(time_point StartTime)
 {
 	m_LastTick  = StartTime;
 	m_StartTime = StartTime;
 }
 
-void CStatusEffect::SetLastTick(uint32 LastTick)
+void CStatusEffect::SetLastTick(time_point LastTick)
 {
 	m_LastTick = LastTick;
 }

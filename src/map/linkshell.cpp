@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include <string.h>
 
 #include "packets/char_update.h"
+#include "packets/chat_message.h"
 #include "packets/inventory_assign.h"
 #include "packets/inventory_finish.h"
 #include "packets/inventory_item.h"
@@ -36,9 +37,12 @@
 #include "conquest_system.h"
 #include "utils/itemutils.h"
 #include "linkshell.h"
+#include "message.h"
 #include "items/item_linkshell.h"
 #include "utils/jailutils.h"
 #include "map.h"
+#include "item_container.h"
+#include "packets/linkshell_message.h"
 
 /************************************************************************
 *                                                                       *
@@ -77,36 +81,17 @@ void CLinkshell::setName(int8* name)
 	m_name.insert(0,name);
 }
 
-const int8* CLinkshell::getPoster()
+void CLinkshell::setMessage(const int8* message, const int8* poster)
 {
-    return m_poster.c_str();
-}
+    int8 sqlMessage[256];
+    Sql_EscapeString(SqlHandle, sqlMessage, message);
+    Sql_Query(SqlHandle, "UPDATE linkshells SET poster = '%s', message = '%s', messagetime = %llu WHERE linkshellid = %d;",
+        poster, sqlMessage , time(nullptr), m_id);
 
-void CLinkshell::setPoster(int8* poster)
-{
-    m_poster.clear();
-	m_poster.insert(0,poster);
-}
-
-const int8* CLinkshell::getMessage()
-{
-    return m_message.c_str();
-}
-
-void CLinkshell::setMessage(int8* message)
-{
-    m_message.clear();
-	m_message.insert(0,message);
-}
-
-uint32 CLinkshell::getMessageTime()
-{
-    return m_time;
-}
-
-void CLinkshell::setMessageTime(uint32 time)
-{
-    m_time = time;
+    int8 packetData[8] {};
+    WBUFL(packetData, 0) = m_id;
+    WBUFL(packetData, 4) = 0;
+    message::send(MSG_CHAT_LINKSHELL, packetData, sizeof packetData, new CLinkshellMessagePacket(poster, message, m_name.c_str(), time(nullptr), true));
 }
 
 /************************************************************************
@@ -115,11 +100,19 @@ void CLinkshell::setMessageTime(uint32 time)
 *                                                                       *
 ************************************************************************/
 
-void CLinkshell::AddMember(CCharEntity* PChar, int8 type)
+void CLinkshell::AddMember(CCharEntity* PChar, int8 type, uint8 lsNum)
 {
     members.push_back(PChar);
-	Sql_Query(SqlHandle,"UPDATE accounts_sessions SET linkshellid = %u , linkshellrank = %u WHERE charid = %u", this->getID(),type, PChar->id);
-    PChar->PLinkshell = this;
+    if (lsNum == 1)
+    {
+        Sql_Query(SqlHandle, "UPDATE accounts_sessions SET linkshellid1 = %u , linkshellrank1 = %u WHERE charid = %u", this->getID(), type, PChar->id);
+        PChar->PLinkshell1 = this;
+    }
+    else
+    {
+        Sql_Query(SqlHandle, "UPDATE accounts_sessions SET linkshellid2 = %u , linkshellrank2 = %u WHERE charid = %u", this->getID(), type, PChar->id);
+        PChar->PLinkshell2 = this;
+    }
 }
 
 /************************************************************************
@@ -128,18 +121,28 @@ void CLinkshell::AddMember(CCharEntity* PChar, int8 type)
 *                                                                       *
 ************************************************************************/
 
-void CLinkshell::DelMember(CCharEntity* PChar)
+bool CLinkshell::DelMember(CCharEntity* PChar)
 {
     for (uint32 i = 0; i < members.size(); ++i)
 	{
         if (members.at(i) == PChar)
         {
-			Sql_Query(SqlHandle,"UPDATE accounts_sessions SET linkshellid = 0 , linkshellrank = 0 WHERE charid = %u", PChar->id);
-            members.erase(members.begin()+i);
+            if (PChar->PLinkshell1 == this)
+            {
+                Sql_Query(SqlHandle, "UPDATE accounts_sessions SET linkshellid1 = 0 , linkshellrank1 = 0 WHERE charid = %u", PChar->id);
+                PChar->PLinkshell1 = nullptr;
+            }
+            else if (PChar->PLinkshell2 == this)
+            {
+                Sql_Query(SqlHandle, "UPDATE accounts_sessions SET linkshellid2 = 0 , linkshellrank2 = 0 WHERE charid = %u", PChar->id);
+                PChar->PLinkshell2 = nullptr;
+            }
+            members.erase(members.begin() + i);
             break;
         }
     }
-    PChar->PLinkshell = NULL;
+    if (members.empty()) { return false; }
+    return true;
 }
 
 /************************************************************************
@@ -162,14 +165,22 @@ void CLinkshell::ChangeMemberRank(int8* MemberName, uint8 toSack)
 		    {
                 CCharEntity* PMember = (CCharEntity*)members.at(i);
 
-                CItemLinkshell* PItemLinkshell = (CItemLinkshell*)PMember->getEquip(SLOT_LINK);
+                SLOTTYPE slot = SLOT_LINK1;
+                int lsID = 1;
+                if (PMember->PLinkshell2 == this)
+                {
+                    lsID = 2;
+                    slot = SLOT_LINK2;
+                }
 
-                if (PItemLinkshell != NULL && PItemLinkshell->isType(ITEM_LINKSHELL))
+                CItemLinkshell* PItemLinkshell = (CItemLinkshell*)PMember->getEquip(slot);
+
+                if (PItemLinkshell != nullptr && PItemLinkshell->isType(ITEM_LINKSHELL))
                 {
 				    PItemLinkshell->setID(newId);
 
                     PMember->pushPacket(new CInventoryAssignPacket(PItemLinkshell, INV_NORMAL));
-                    PMember->pushPacket(new CLinkshellEquipPacket(PMember));
+                    PMember->pushPacket(new CLinkshellEquipPacket(PMember, lsID));
                 }
 
 			    CItemContainer* Inventory = PMember->getStorage(LOC_INVENTORY);
@@ -177,20 +188,26 @@ void CLinkshell::ChangeMemberRank(int8* MemberName, uint8 toSack)
                 {
                         CItemLinkshell* PItemLinkshell = (CItemLinkshell*)Inventory->GetItem(SlotID);
 
-					    if (PItemLinkshell != NULL && PItemLinkshell->isType(ITEM_LINKSHELL) && PItemLinkshell->GetLSID() == m_id)
+					    if (PItemLinkshell != nullptr && PItemLinkshell->isType(ITEM_LINKSHELL) && PItemLinkshell->GetLSID() == m_id)
 		                {
                             const int8* Query = "UPDATE char_inventory SET itemid = %u WHERE charid = %u AND location = %u AND slot = %u LIMIT 1";
 						    Sql_Query(SqlHandle, Query, PItemLinkshell->getID(),PMember->id, LOC_INVENTORY, SlotID);
-						    Sql_Query(SqlHandle,"UPDATE accounts_sessions SET linkshellid = %u , linkshellrank = %u WHERE charid = %u", 
-										    m_id,PItemLinkshell->GetLSType(), PMember->id);
+                            if (lsID == 1)
+                            {
+                                Sql_Query(SqlHandle, "UPDATE accounts_sessions SET linkshellid1 = %u , linkshellrank1 = %u WHERE charid = %u",
+                                    m_id, PItemLinkshell->GetLSType(), PMember->id);
+                            }
+                            else if (lsID == 2)
+                            {
+                                Sql_Query(SqlHandle, "UPDATE accounts_sessions SET linkshellid2 = %u , linkshellrank2 = %u WHERE charid = %u",
+                                    m_id, PItemLinkshell->GetLSType(), PMember->id);
+                            }
                             PMember->pushPacket(new CInventoryItemPacket(PItemLinkshell, LOC_INVENTORY, SlotID));
 		                }
                 }
 	        
                 charutils::SaveCharStats(PMember);
                 charutils::SaveCharEquip(PMember);
-
-                if (PMember->status == STATUS_NORMAL) PMember->status = STATUS_UPDATE;
 
                 PMember->pushPacket(new CInventoryFinishPacket());
                 PMember->pushPacket(new CCharUpdatePacket(PMember));
@@ -214,19 +231,32 @@ void CLinkshell::RemoveMemberByName(int8* MemberName)
 		{
             CCharEntity* PMember = (CCharEntity*)members.at(i);
 
-            CItemLinkshell* PItemLinkshell = (CItemLinkshell*)PMember->getEquip(SLOT_LINK);
+            CItemLinkshell* PItemLinkshell = (CItemLinkshell*)PMember->getEquip(SLOT_LINK1);
+            SLOTTYPE slot = SLOT_LINK1;
+            int lsNum = 1;
 
-            if (PItemLinkshell != NULL && PItemLinkshell->isType(ITEM_LINKSHELL))
+            if (PItemLinkshell->GetLSID() != this->getID())
+            {
+                PItemLinkshell = (CItemLinkshell*)PMember->getEquip(SLOT_LINK2);
+                slot = SLOT_LINK2;
+                lsNum = 2;
+            }
+
+            if (PItemLinkshell != nullptr && PItemLinkshell->isType(ITEM_LINKSHELL))
             {
                 linkshell::DelOnlineMember(PMember, PItemLinkshell);
 
                 PItemLinkshell->setSubType(ITEM_UNLOCKED);
 
-                PMember->equip[SLOT_LINK] = 0;
-                PMember->nameflags.flags &= ~FLAG_LINKSHELL;
+                PMember->equip[slot] = 0;
+                if (slot == SLOT_LINK1)
+                {
+                    PMember->nameflags.flags &= ~FLAG_LINKSHELL;
+                    PMember->updatemask |= UPDATE_HP;
+                }
 
                 PMember->pushPacket(new CInventoryAssignPacket(PItemLinkshell, INV_NORMAL));
-                PMember->pushPacket(new CLinkshellEquipPacket(PMember));
+                PMember->pushPacket(new CLinkshellEquipPacket(PMember,lsNum));
             }
 
 			CItemContainer* Inventory = PMember->getStorage(LOC_INVENTORY);
@@ -234,7 +264,7 @@ void CLinkshell::RemoveMemberByName(int8* MemberName)
             {
                     CItemLinkshell* PItemLinkshell = (CItemLinkshell*)Inventory->GetItem(SlotID);
 
-					if (PItemLinkshell != NULL && PItemLinkshell->isType(ITEM_LINKSHELL) && PItemLinkshell->GetLSID() == m_id)
+					if (PItemLinkshell != nullptr && PItemLinkshell->isType(ITEM_LINKSHELL) && PItemLinkshell->GetLSID() == m_id)
 		            {
                         const int8* Query = "UPDATE char_inventory SET itemid = (itemid+2) WHERE charid = %u AND location = %u AND slot = %u LIMIT 1";
 
@@ -250,8 +280,6 @@ void CLinkshell::RemoveMemberByName(int8* MemberName)
             charutils::SaveCharStats(PMember);
             charutils::SaveCharEquip(PMember);
 
-            if (PMember->status == STATUS_NORMAL) PMember->status = STATUS_UPDATE;
-
             PMember->pushPacket(new CInventoryFinishPacket());
             PMember->pushPacket(new CCharUpdatePacket(PMember));
             PMember->pushPacket(new CMessageSystemPacket(0,0,109));
@@ -266,18 +294,39 @@ void CLinkshell::RemoveMemberByName(int8* MemberName)
 *                                                                       *
 ************************************************************************/
 
-void CLinkshell::PushPacket(CCharEntity* PChar, CBasicPacket* packet)
+void CLinkshell::PushPacket(uint32 senderID, CBasicPacket* packet)
 {
     for (uint32 i = 0; i < members.size(); ++i)
 	{
-        if (members.at(i) != PChar &&
+        if (members.at(i)->id != senderID &&
             members.at(i)->status != STATUS_DISAPPEAR &&
             !jailutils::InPrison(members.at(i)))
 		{
-            members.at(i)->pushPacket(new CBasicPacket(*packet));
+            CBasicPacket* newPacket = new CBasicPacket(*packet);
+            if (members.at(i)->PLinkshell2 == this)
+            {
+                if (newPacket->id() == CChatMessagePacket::id) {
+                    newPacket->ref<uint8>(0x04) = MESSAGE_LINKSHELL2;
+                }
+                else if (newPacket->id() == CLinkshellMessagePacket::id) {
+                    newPacket->ref<uint8>(0x05) |= 0x40;
+                }
+            }
+            members.at(i)->pushPacket(newPacket);
 		}
 	}
     delete packet;
+}
+
+void CLinkshell::PushLinkshellMessage(CCharEntity* PChar, bool ls1)
+{
+    auto ret = Sql_Query(SqlHandle, "SELECT poster, message, messagetime FROM linkshells WHERE linkshellid = %u", m_id);
+
+    if (ret != SQL_ERROR && Sql_NumRows(SqlHandle) != 0 && Sql_NextRow(SqlHandle) == SQL_SUCCESS)
+    {
+        PChar->pushPacket(new CLinkshellMessagePacket(Sql_GetData(SqlHandle, 0), Sql_GetData(SqlHandle, 1),
+            m_name.c_str(), Sql_GetUIntData(SqlHandle, 2), ls1));
+    }
 }
 
 /************************************************************************
@@ -286,11 +335,9 @@ void CLinkshell::PushPacket(CCharEntity* PChar, CBasicPacket* packet)
 *                                                                       *
 ************************************************************************/
 
-typedef std::map<uint32,CLinkshell*> LinkshellList_t;
-
 namespace linkshell
 {
-    LinkshellList_t LinkshellList;
+    std::map<uint32, std::unique_ptr<CLinkshell>> LinkshellList;
 
     /************************************************************************
     *                                                                       *
@@ -298,32 +345,23 @@ namespace linkshell
     *                                                                       *
     ************************************************************************/
 
-    void LoadLinkshellList()
+    CLinkshell* LoadLinkshell(uint32 id)
     {
-	    int32 ret = Sql_Query(SqlHandle, "SELECT linkshellid, color, name, poster, message, messagetime FROM linkshells");
+	    int32 ret = Sql_Query(SqlHandle, "SELECT linkshellid, color, name FROM linkshells WHERE linkshellid = %d", id);
 
-	    if( ret != SQL_ERROR && Sql_NumRows(SqlHandle) != 0)
+	    if( ret != SQL_ERROR && Sql_NumRows(SqlHandle) != 0 && Sql_NextRow(SqlHandle) == SQL_SUCCESS)
 	    {
-		    while(Sql_NextRow(SqlHandle) == SQL_SUCCESS) 
-		    {
-			    CLinkshell* PLinkshell = new CLinkshell(Sql_GetUIntData(SqlHandle,0));
-			
-			    PLinkshell->setColor(Sql_GetIntData(SqlHandle,1));
-                int8 EncodedName[16];
-                EncodeStringLinkshell(Sql_GetData(SqlHandle,2), EncodedName);
-                PLinkshell->setName(EncodedName);
-                PLinkshell->setPoster(Sql_GetData(SqlHandle,3));
+            auto PLinkshell = std::make_unique<CLinkshell>(Sql_GetUIntData(SqlHandle,0));
+        
+            PLinkshell->setColor(Sql_GetIntData(SqlHandle,1));
+            int8 EncodedName[16];
+            EncodeStringLinkshell(Sql_GetData(SqlHandle,2), EncodedName);
+            PLinkshell->setName(EncodedName);
+            LinkshellList[id] = std::move(PLinkshell);
 
-                int8* linkshellMessage = Sql_GetData(SqlHandle, 4);
-                if (linkshellMessage != NULL)
-                    PLinkshell->setMessage(linkshellMessage);
-                else
-                    PLinkshell->setMessage("");
-                PLinkshell->setMessageTime(Sql_GetUIntData(SqlHandle,5));
-
-                LinkshellList[PLinkshell->getID()] = PLinkshell;
-		    }
+            return LinkshellList[id].get();
 	    }
+        return nullptr;
     }
 
     /************************************************************************
@@ -332,17 +370,24 @@ namespace linkshell
     *                                                                       *
     ************************************************************************/
 
-    bool AddOnlineMember(CCharEntity* PChar, CItemLinkshell* PItemLinkshell)
+    bool AddOnlineMember(CCharEntity* PChar, CItemLinkshell* PItemLinkshell, uint8 lsNum)
     {
-        DSP_DEBUG_BREAK_IF(PChar == NULL);
-        if (PItemLinkshell != NULL && PItemLinkshell->isType(ITEM_LINKSHELL))
+        DSP_DEBUG_BREAK_IF(PChar == nullptr);
+        if (PItemLinkshell != nullptr && PItemLinkshell->isType(ITEM_LINKSHELL))
         {
-            LinkshellList_t::const_iterator it = LinkshellList.find(PItemLinkshell->GetLSID()); 
-			if (it != LinkshellList.end())
-			{
-                it->second->AddMember(PChar,PItemLinkshell->GetLSType());
-                ShowDebug(CL_CYAN"linkshell:AddOnlineMember <%u>\n" CL_RESET, it->first);
-			}
+            CLinkshell* PLinkshell = nullptr;
+            try
+            {
+                PLinkshell = LinkshellList.at(PItemLinkshell->GetLSID()).get();
+            }
+            catch (std::out_of_range&)
+            {
+                PLinkshell = LoadLinkshell(PItemLinkshell->GetLSID());
+            }
+            if (PLinkshell)
+            {
+                PLinkshell->AddMember(PChar, PItemLinkshell->GetLSType(), lsNum);
+            }
         }
         return false;
     }
@@ -355,16 +400,20 @@ namespace linkshell
 
     bool DelOnlineMember(CCharEntity* PChar, CItemLinkshell* PItemLinkshell)
     {
-        DSP_DEBUG_BREAK_IF(PChar == NULL);
-        if (PItemLinkshell != NULL && PItemLinkshell->isType(ITEM_LINKSHELL))
+        DSP_DEBUG_BREAK_IF(PChar == nullptr);
+        if (PItemLinkshell != nullptr && PItemLinkshell->isType(ITEM_LINKSHELL))
         {
-            LinkshellList_t::const_iterator it = LinkshellList.find(PItemLinkshell->GetLSID()); 
-			if (it != LinkshellList.end())
-			{
-				it->second->DelMember(PChar);
-
-                ShowDebug(CL_CYAN"linkshell:DelOnlineMember <%u>\n" CL_RESET, it->first);
-			}
+            try
+            {
+                CLinkshell* Linkshell = LinkshellList.at(PItemLinkshell->GetLSID()).get();
+                if (!Linkshell->DelMember(PChar))
+                {
+                    LinkshellList.erase(PItemLinkshell->GetLSID());
+                }
+            }
+            catch (std::out_of_range&)
+            {
+            }
         }
         return false;
     }
@@ -377,11 +426,8 @@ namespace linkshell
 
     bool IsValidLinkshellName(const int8* name)
     {
-        for (LinkshellList_t::iterator it = LinkshellList.begin(); it != LinkshellList.end() ; ++it)
-	    {
-            if (strcmp(it->second->getName(), name) == 0) return false;
-        }
-        return true;
+        auto ret = Sql_Query(SqlHandle, "SELECT linkshellid FROM linkshells WHERE name = '%s';", name);
+        return ret == SQL_ERROR || Sql_NumRows(SqlHandle) == 0;
     }
 
     /************************************************************************
@@ -396,17 +442,21 @@ namespace linkshell
         {
 		    if (Sql_Query(SqlHandle, "INSERT INTO linkshells (name, color) VALUES ('%s', %u)", name, color) != SQL_ERROR)
             {
-                CLinkshell* PLinkshell = new CLinkshell(Sql_LastInsertId(SqlHandle));
-			
-			    PLinkshell->setColor(color);
-                PLinkshell->setName((int8*)name);
-                PLinkshell->setMessage("");
-                
-                LinkshellList[PLinkshell->getID()] = PLinkshell;
-
-                return PLinkshell->getID();
+                return LoadLinkshell(Sql_LastInsertId(SqlHandle))->getID();
             }
         }
         return 0;
     }
+
+	CLinkshell* GetLinkshell(uint32 id)
+	{
+		try
+		{
+			return LinkshellList.at(id).get();
+		}
+		catch (const std::out_of_range&)
+		{
+			return nullptr;
+		}
+	}
 };

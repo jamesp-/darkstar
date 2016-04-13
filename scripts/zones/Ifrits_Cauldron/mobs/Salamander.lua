@@ -1,18 +1,18 @@
 -----------------------------------
 -- Area: Ifrit's Cauldron
--- NPC:  Salamander
+--  MOB: Salamander
 -----------------------------------
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

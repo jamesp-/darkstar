@@ -2,19 +2,20 @@
 -- Zantetsuken
 ---------------------------------------------------
 
-require("/scripts/globals/settings");
-require("/scripts/globals/status");
-require("/scripts/globals/monstertpmoves");
-require("/scripts/globals/magic");
+require("scripts/globals/settings");
+require("scripts/globals/status");
+require("scripts/globals/monstertpmoves");
+require("scripts/globals/magic");
 
 ---------------------------------------------------
 
-function OnAbilityCheck(player, target, ability)
+function onAbilityCheck(player, target, ability)
     return 0,0;
 end;
 
-function OnPetAbility(target, pet, skill, master)
+function onPetAbility(target, pet, skill, master)
     local power = master:getMP() / master:getMaxMP();
+    master:setMP(0);
 
     if (target:isNM()) then
         local dmg = 0.1 * target:getHP() + 0.1 * target:getHP() * power;

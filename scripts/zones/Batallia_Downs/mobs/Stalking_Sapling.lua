@@ -1,29 +1,30 @@
------------------------------------	
--- Area: Batallia Downs	
--- MOB:  Stalking Sapling	
------------------------------------	
-	
-require("/scripts/globals/fieldsofvalor");	
-require("/scripts/zones/Batallia_Downs/MobIDs");
+-----------------------------------
+-- Area: Batallia Downs
+--  MOB: Stalking Sapling
+-----------------------------------
 
------------------------------------	
--- onMobDeath	
------------------------------------	
-	
-function onMobDeath(mob,killer)	
+require("scripts/globals/fieldsofvalor");
+require("scripts/zones/Batallia_Downs/MobIDs");
 
-    mob = mob:getID();
-    if (Tottering_Toby_PH[mob] ~= nil) then
+-----------------------------------
+-- onMobDeath
+-----------------------------------
 
-        ToD = GetServerVariable("[POP]Tottering_Toby");
+function onMobDeath(mob,killer,ally)
+    checkRegime(ally,mob,72,1);
+    checkRegime(ally,mob,73,1);
+
+    local mobID = mob:getID();
+    if (Tottering_Toby_PH[mobID] ~= nil) then
+        local ToD = GetServerVariable("[POP]Tottering_Toby");
         if (ToD <= os.time(t) and GetMobAction(Tottering_Toby) == 0) then
-            if (math.random((1),(20)) == 5) then
+            if (math.random(1,20) == 5) then
                 UpdateNMSpawnPoint(Tottering_Toby);
-                GetMobByID(Tottering_Toby):setRespawnTime(GetMobRespawnTime(mob));
-                SetServerVariable("[PH]Tottering_Toby", mob);
-                DeterMob(mob, true);
+                GetMobByID(Tottering_Toby):setRespawnTime(GetMobRespawnTime(mobID));
+                SetServerVariable("[PH]Tottering_Toby", mobID);
+                DeterMob(mobID, true);
             end
         end
     end
-    
-end;	
+
+end;

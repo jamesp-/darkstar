@@ -1,18 +1,18 @@
 -----------------------------------
 -- Area: Caedarva Mire
--- NPC:  Khimaira
+--  MOB: Khimaira
 -----------------------------------
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
+function onMobDeath(mob, killer, ally)
 end;

@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Davoi
--- NPC: Gavotvut
+--  MOB: Gavotvut
 -- Involved in Quest: The Doorman
 -----------------------------------
 
@@ -11,17 +11,17 @@ require("scripts/globals/quests");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	
-	if(killer:getVar("theDoormanMyMob") == 1) then
-		killer:setVar("theDoormanKilledNM",killer:getVar("theDoormanKilledNM") + 1);
-	end
-	
+function onMobDeath(mob, killer, ally)
+
+    if (ally:getVar("theDoormanMyMob") == 1) then
+        ally:setVar("theDoormanKilledNM",ally:getVar("theDoormanKilledNM") + 1);
+    end
+
 end;

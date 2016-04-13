@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: BCNM
--- NPC:  Lambton Worm
+--  MOB: Lambton Worm
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(LAMBTON_WORM_DESEGMENTER);
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(LAMBTON_WORM_DESEGMENTER);
 end;

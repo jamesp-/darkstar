@@ -1,24 +1,23 @@
 ---------------------------------------------------
--- Berserk
--- Berserk Ability.
+-- Benediction
 ---------------------------------------------------
 
-require("/scripts/globals/settings");
-require("/scripts/globals/status");
-require("/scripts/globals/monstertpmoves");
+require("scripts/globals/settings");
+require("scripts/globals/status");
+require("scripts/globals/monstertpmoves");
 
 ---------------------------------------------------
 
-function OnMobSkillCheck(target,mob,skill)
-    if (skill:getParam() ~= 0) then
+function onMobSkillCheck(target,mob,skill)
+    if (mob:getMobMod(MOBMOD_SCRIPTED_2HOUR) == 1) then
         return 1;
-    elseif(mob:getHPP() <= 50) then
+    elseif (mob:getHPP() <= mob:getMobMod(MOBMOD_2HOUR_PROC)) then
         return 0;
     end
     return 1;
 end;
 
-function OnMobWeaponSkill(target, mob, skill)
+function onMobWeaponSkill(target, mob, skill)
     target:eraseAllStatusEffect();
 
     local maxHeal = target:getMaxHP() - target:getHP();

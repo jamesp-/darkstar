@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Ifrit's Cauldron
--- NPC:  Ash Dragon
+--  MOB: Ash Dragon
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,17 +9,17 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-    killer:addTitle(DRAGON_ASHER);
-    
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(DRAGON_ASHER);
+
     -- Set ASh Dragon's spawnpoint and respawn time (3-5 Days)
     UpdateNMSpawnPoint(mob:getID());
-    mob:setRespawnTime(math.random((259200),(432000)));
+    mob:setRespawnTime(math.random(259200,432000));
 end;

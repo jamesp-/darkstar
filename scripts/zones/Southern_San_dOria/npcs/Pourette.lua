@@ -6,7 +6,7 @@
 package.loaded["scripts/zones/Southern_San_dOria/TextIDs"] = nil;
 -----------------------------------
 
-require("scripts/globals/harvest_festivals");
+require("scripts/globals/events/harvest_festivals");
 require("scripts/globals/settings");
 require("scripts/globals/shop");
 require("scripts/globals/quests");
@@ -18,14 +18,14 @@ require("scripts/zones/Southern_San_dOria/TextIDs");
 -----------------------------------
 
 function onTrade(player,npc,trade)
-	-- "Flyers for Regine" conditional script
-	if (player:getQuestStatus(SANDORIA,FLYERS_FOR_REGINE) == 1) then
-		if (trade:hasItemQty(532,1) == true and trade:getItemCount() == 1) then
-			player:messageSpecial(FLYER_REFUSED);
-		end
-	else
-		onHalloweenTrade(player,trade,npc);
-	end
+    -- "Flyers for Regine" conditional script
+    if (player:getQuestStatus(SANDORIA,FLYERS_FOR_REGINE) == 1) then
+        if (trade:hasItemQty(532,1) == true and trade:getItemCount() == 1) then
+            player:messageSpecial(FLYER_REFUSED);
+        end
+    else
+        onHalloweenTrade(player,trade,npc);
+    end
 end;
 
 -----------------------------------

@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #define _CAUTOMATONENTITY_H
 
 #include "petentity.h"
+#include <array>
 
 enum AUTOFRAMETYPE
 {
@@ -46,9 +47,9 @@ enum AUTOHEADTYPE
 
 struct automaton_equip_t
 {
-    uint8 Frame;
-    uint8 Head;
-    uint8 Attachments[12];
+    uint8 Frame{ 0 };
+    uint8 Head{ 0 };
+    std::array<uint8, 12> Attachments{};
 };
 
 class CCharEntity;
@@ -57,11 +58,11 @@ class CAutomatonEntity : public CPetEntity
 {
 public:
 	 CAutomatonEntity();
-	~CAutomatonEntity();        	                
+	~CAutomatonEntity();
 
     automaton_equip_t m_Equip;
-    uint8 m_ElementMax[8];
-    uint8 m_ElementEquip[8];
+    std::array<uint8, 8> m_ElementMax;
+    std::array<uint8, 8> m_ElementEquip;
 
     void setFrame(AUTOFRAMETYPE frame);
     void setHead(AUTOHEADTYPE head);
@@ -73,13 +74,21 @@ public:
     AUTOFRAMETYPE getFrame();
     AUTOHEADTYPE getHead();
     uint8 getAttachment(uint8 slot);
+    bool hasAttachment(uint8 attachment);
 
     uint8 getElementMax(uint8 element);
     uint8 getElementCapacity(uint8 element);
 
-private:
+    void burdenTick();
+    void setInitialBurden();
+    uint8 addBurden(uint8 element, uint8 burden);
 
-    uint16 m_Burden[8];
+    void PostTick() override;
+
+    virtual void Die() override;
+
+private:
+    std::array<uint8, 8> m_Burden {};
 };
 
 #endif

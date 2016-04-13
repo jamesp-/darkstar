@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Horlais Peak
--- NPC:  Chlevnik
+--  MOB: Chlevnik
 -- KSNM99
 -----------------------------------
 
@@ -8,12 +8,12 @@
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

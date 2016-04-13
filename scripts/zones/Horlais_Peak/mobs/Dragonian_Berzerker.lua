@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Horlais Peak
--- NPC:  Dragonian_Bezerker
+--  MOB: Dragonian_Bezerker
 -- KSNM30
 -----------------------------------
 
@@ -8,12 +8,12 @@
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

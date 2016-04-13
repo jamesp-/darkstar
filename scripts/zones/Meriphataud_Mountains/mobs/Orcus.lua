@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Meriphataud Mountains
--- NPC:  Krabkatoa
+--  MOB: Krabkatoa
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(ORCUS_TROPHY_HUNTER);
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(ORCUS_TROPHY_HUNTER);
 end;

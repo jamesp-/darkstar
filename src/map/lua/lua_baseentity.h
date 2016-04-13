@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -26,40 +26,9 @@
 
 #include "../../common/cbasetypes.h"
 #include "../../common/lua/lunar.h"
-#include "../entities/charentity.h"
-
-/************************************************************************
-*  Used in GM command @addallspells                                     *
-*  A giant list of all VALID spell id's (Ignoring "." Spells from DB)   *
-*                                                                       *
-*  The DB contains many spell id's that have no spell value's           *
-*  and will just add a bunch of fullstops to the GM's spell list        *
-*                                                                       *
-*  556 spells in this list. DB contains around 150 dead spells          *
-************************************************************************/
-
-static uint16 ValidSpells[] =
-{
-    1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,
-    46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,86,87,88,89,
-    90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,
-    124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,
-    156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,
-    188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,
-    220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,245,246,247,248,249,250,251,252,253,
-    254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,
-    287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303,304,312,318,320,321,322,323,324,325,326,327,328,329,330,331,
-    332,333,334,335,336,337,338,339,340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,357,358,359,360,361,362,363,
-    364,365,366,367,368,369,370,371,372,373,374,375,376,377,378,379,380,381,382,383,384,385,386,387,388,389,390,391,392,393,394,395,
-    396,397,398,399,400,401,402,403,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,422,423,424,425,426,427,
-    428,429,430,431,432,433,434,435,436,437,438,439,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,
-    460,461,462,463,464,465,466,467,468,469,477,478,504,513,515,517,519,521,522,524,527,529,530,531,532,533,534,535,536,537,538,539,
-    540,541,542,543,544,545,547,548,549,551,554,555,557,560,561,563,564,565,567,569,570,572,573,574,575,576,577,578,579,581,582,584,
-    585,587,588,589,591,592,593,594,595,596,597,598,599,603,604,605,606,608,610,611,612,613,614,615,616,617,618,620,621,622,623,626,
-    628,629,631,632,633,634,636,637,638,640,641,642,643,644,645,646,647,648,650,651,652,653
-};
 
 class CBaseEntity;
+class CCharEntity;
 
 class CLuaBaseEntity
 {
@@ -84,10 +53,13 @@ public:
 
     int32 getID(lua_State *L);              // Gets Entity Id
     int32 getShortID(lua_State *L);
+    int32 getCursorTarget(lua_State *L);    // Returns the ID any object under players in game cursor.
+    int32 getPool(lua_State *L);            // Returns a mobs pool ID. If entity is not a mob, returns nil.
     int32 getName(lua_State *L);            // Gets Entity Name
 
     int32 getHPP(lua_State*);               // Returns Entity Health %
     int32 getHP(lua_State*);                // Returns Entity Health
+    int32 getGender(lua_State*);			// Returns the player character's gender
     int32 getBaseHP(lua_State*);            // Returns Entity base Health before modifiers
     int32 addHP(lua_State*);                // Modify hp of Entity +/-
     int32 restoreHP(lua_State*);            // Modify hp of Entity, but check if alive first
@@ -127,7 +99,9 @@ public:
     int32 getPos(lua_State*);               // Get Entity position (x,y,z)
     int32 getSpawnPos(lua_State*);          // Get Mob spawn position (x,y,z)
     int32 getZone(lua_State*);              // Get Entity zone
+    int32 getZoneID(lua_State*);            // Get Entity zone ID
     int32 getZoneName(lua_State*);          // Get Entity zone name
+    int32 isInMogHouse(lua_State*);         // Check if entity inside a mog house
     int32 getCurrentRegion(lua_State*);     // Get Entity conquest region
     int32 getPreviousZone(lua_State*);      // Get Entity previous zone
     int32 getContinentID(lua_State*);       // узнаем континент, на котором находится сущность
@@ -140,7 +114,7 @@ public:
     int32 setAnimation(lua_State*);         // Set Entity Animation
     int32 AnimationSub(lua_State*);         // get or set animationsub
     int32 costume(lua_State*);              // get or set user costume
-	int32 costume2(lua_State*);				// set monstrosity costume
+    int32 costume2(lua_State*);				// set monstrosity costume
     int32 canUseCostume(lua_State*);        // check to see if character can use costume, 0 if so
     int32 canUseChocobo(lua_State *L);      // check to see if character can use chocobo, 0 if so
     int32 canUsePet(lua_State *L);          // check to see if character can call pet, 0 if so
@@ -148,12 +122,16 @@ public:
     int32 addItem(lua_State*);              // Add item to Entity inventory (additem(itemNumber,quantity))
     int32 hasItem(lua_State*);              // Check to see if Entity has item in inventory (hasItem(itemNumber))
     int32 addTempItem(lua_State*);          // Add temp item to Entity Temp inventory
+    int32 delItem(lua_State*);
     int32 getFreeSlotsCount(lua_State*);    // Gets value of free slots in Entity inventory
     int32 createWornItem(lua_State*);       // Update this item in worn item (player:createWornItem(itemid))
     int32 hasWornItem(lua_State*);          // Check if the item is already worn (player:hasWornItem(itemid))
+    int32 getStorageItem(lua_State*);       // returns item object player:getStorageItem(containerid, slotid, equipslotid)
     int32 getRace(lua_State*);              // Gets Race of Entity
     int32 getNation(lua_State*);            // Gets Nation of Entity
     int32 setNation(lua_State*);            // Sets Nation of Entity
+    int32 getCampaignAllegiance(lua_State*); // Gets Campaign Allegiance of Entity
+    int32 setCampaignAllegiance(lua_State*); // Sets Campaign Allegiance of Entity
 
     int32 addQuest(lua_State*);             // Add Quest to Entity Quest Log
     int32 delQuest(lua_State*);             // Remove quest from quest log (should be used for debugging only)
@@ -166,6 +144,12 @@ public:
     int32 hasCompletedMission(lua_State*);  // Checks if mission has been completed
     int32 getCurrentMission(lua_State*);    // Gets the current mission
     int32 completeMission(lua_State*);      // Complete Mission
+
+    int32 addAssault(lua_State*);           // Add Mission
+    int32 delAssault(lua_State*);           // Delete Mission from Mission Log
+    int32 hasCompletedAssault(lua_State*);  // Checks if mission has been completed
+    int32 getCurrentAssault(lua_State*);    // Gets the current mission
+    int32 completeAssault(lua_State*);      // Complete Mission
 
     int32 getRank(lua_State*);              // Get Current Rank
     int32 setRank(lua_State*);              // Set Rank
@@ -181,12 +165,12 @@ public:
     int32 delKeyItem(lua_State*);           // Removes key item from Entity key item collection
 
     int32 getSkillLevel(lua_State*);        // Get Current Skill Level
+    int32 setSkillLevel(lua_State*);        // Set Current Skill Level
     int32 getMaxSkillLevel(lua_State*);     // Get Skill Cap for skill and rank
     int32 getSkillRank(lua_State*);         // Get your current skill craft Rank
     int32 setSkillRank(lua_State*);         // Set new skill craft rank
     int32 getWeaponSkillLevel(lua_State*);  // Get Skill for equipped weapon
     int32 addSpell(lua_State*);             // Add spell to Entity spell list
-    int32 addAllSpells(lua_State*);         // Add all spells to GM char
     int32 hasSpell(lua_State*);             // Check to see if character has item in spell list
     int32 canLearnSpell(lua_State*);        // Check to see if character can learn spell, 0 if so
     int32 delSpell(lua_State*);             // Remove spell from Entity spell list
@@ -224,6 +208,8 @@ public:
 
     int32 sendMenu(lua_State*);             // Displays a menu (AH,Raise,Tractor,MH etc)
     int32 sendGuild(lua_State*);            // Sends guild shop menu
+    int32 getCurrentGPItem(lua_State*);     // Gets current GP item id and max points
+    int32 addGuildPoints(lua_State*);       // add guild points
 
     int32 bcnmRegister(lua_State*);                  //Attempts to register a bcnm battlefield (used by Dynamis and BCNM)
     int32 bcnmEnter(lua_State*);                     //Enter a bcnm battlefield (used by Dynamis and BCNM)
@@ -299,8 +285,7 @@ public:
     int32 getFameLevel(lua_State*);         // Gets Fame Level for specified nation
 
     int32 setStatus(lua_State*);            // Sets Character's Status
-	int32 getStatus(lua_State*);
-    int32 setPVPFlag(lua_State*);           // Allow to attack this player
+    int32 getStatus(lua_State*);
 
     int32 sendRaise(lua_State*);            // send raise request to char
     int32 sendReraise(lua_State*);          // send raise request to char
@@ -308,19 +293,19 @@ public:
     int32 SendRevision(lua_State*);         // send Git revision to char
 
     int32 updateEnmity(lua_State*);           // Adds Enmity to player for specified mob
+    int32 updateClaim(lua_State*);           // Adds Enmity to player for specified mob and claims
     int32 updateEnmityFromDamage(lua_State*); // Adds Enmity to player for specified mob for the damage specified
     int32 updateEnmityFromCure(lua_State*);
     int32 addEnmity(lua_State*);            // Add specified amount of enmity (target, CE, VE)
     int32 resetEnmity(lua_State*);          //resets enmity to player for specificed mob
     int32 lowerEnmity(lua_State*);          //lower enmity to player for specificed mob
+    int32 transferEnmity(lua_State*);
 
     int32 hasImmunity(lua_State*);          // Check if the mob has immunity for a type of spell (list at mobentity.h)
     int32 getBattleTime(lua_State*);        // Get the time in second of the battle
     int32 rageMode(lua_State*);             // Add rage mode
     int32 isUndead(lua_State*);             // True if mob is undead
     int32 isMobType(lua_State*);            // True if mob is of type passed to function
-    int32 changeSkin(lua_State*);           // Change mob skin
-    int32 getSkinID(lua_State*);            // Get Skin ID (0 for base skin)
     int32 getSystem(lua_State*);
     int32 getFamily(lua_State*);
 
@@ -331,6 +316,7 @@ public:
     int32 hasBustEffect(lua_State*);          // Checks to see if a character has a specified busted corsair roll
     int32 canGainStatusEffect(lua_State*);    // Returns true if the effect can be added
     int32 getStatusEffect(lua_State*);        //
+    int32 getStatusEffects(lua_State*);
     int32 delStatusEffect(lua_State*);        // Removes Status Effect
     int32 delStatusEffectsByFlag(lua_State*); // Removes Status Effects by Flag
     int32 delStatusEffectSilent(lua_State*);  // Removes Status Effect, suppresses message
@@ -348,6 +334,7 @@ public:
     int32 removePartyEffect(lua_State*);      // Removes Effect from all party members
     int32 hasPartyEffect(lua_State*);         // Has Effect from all party members
     int32 addCorsairRoll(lua_State*);         // Adds corsair roll effect
+    int32 doWildCard(lua_State*);
     int32 addBardSong(lua_State*);            // Adds bard song effect
     int32 hasPartyJob(lua_State*);
     int32 fold(lua_State*);
@@ -358,21 +345,27 @@ public:
     int32 delMod(lua_State*);                // Subtracts Modifier Value
     int32 setMod(lua_State*);                // Sets Modifier Value
 
+    int32 addPetMod(lua_State*);
+    int32 delPetMod(lua_State*);
+    int32 setPetMod(lua_State*);
+
     int32 getMobMod(lua_State*);
     int32 setMobMod(lua_State*);
 
     int32 hasTrait(lua_State*);
 
     int32 addExp(lua_State*);                // Add to Character Experience
+    int32 delExp(lua_State*);                // Subtracts from Character Experience
 
     int32 getPetElement(lua_State*);
     int32 getPetName(lua_State*);
-    int32 charmPet(lua_State*);              // Charms Pet
+    int32 charmPet(lua_State*);              // Charms Pet (Beastmaster ability only)
+    int32 charm(lua_State*);                 // applies charm on target
+    int32 uncharm(lua_State*);               // removes charm on target
     int32 spawnPet(lua_State*);              // Calls Pet
     int32 despawnPet(lua_State*);            // Despawns Pet
     int32 petAttack(lua_State*);             // Despawns Pet
     int32 petRetreat(lua_State*);
-    int32 petStay(lua_State*);
     int32 petAbility(lua_State*);
     int32 hasPet(lua_State*);                // returns true if the player has a pet
     int32 getPet(lua_State*);                // Creates an LUA reference to a pet entity
@@ -396,6 +389,7 @@ public:
     int32 changeJob(lua_State*);             // changes the job of a char (testing only!)
     int32 setMerits(lua_State*);             // set merits (testing only!)
     int32 getMerit(lua_State*);
+    int32 getMeritCount(lua_State*);         // Gets a players current merit count.
     int32 getPlaytime(lua_State*);
     int32 changesJob(lua_State*);            // changes the sub job of a char (testing only!)
     int32 getWeaponDmg(lua_State*);          // gets the current equipped weapons' DMG rating
@@ -411,7 +405,7 @@ public:
     int32 isBehind(lua_State*);               // true if you're behind the input target
     int32 isFacing(lua_State*);               // true if you are facing the target
     int32 getAngle(lua_State* L);             // return angle (rot) between two points (vector from a to b)
-    int32 isTrickAttackAvailable(lua_State*); //true if TA target is available
+    int32 getTrickAttackChar(lua_State*); //true if TA target is available
     int32 getStealItem(lua_State*);           // gets ItemID of droplist steal item from mob
     int32 itemStolen(lua_State*);             // sets mob's ItemStolen var = true
 
@@ -419,78 +413,35 @@ public:
     int32 closeDoor(lua_State*);            // npc.closeDoor(timeToStayClosed)
     int32 showNPC(lua_State*);              // Show an NPC
     int32 hideNPC(lua_State*);              // hide an NPC
+    int32 updateNPCHideTime(lua_State*);    // Updates the length of time a NPC remains hidden, if shorter than the original hide time.
+
+    int32 addRecast(lua_State*);
     int32 resetRecasts(lua_State*);         // Reset recasts for the caller
     int32 resetRecast(lua_State*);          // Reset one recast ID
 
-    int32 addCP(lua_State*);                // Add CP
+    int32 getCurrency(lua_State*);          // Get Currency
+    int32 addCurrency(lua_State*);          // Add Currency
+    int32 delCurrency(lua_State*);          // Delete Currency
+
     int32 getCP(lua_State*);                // Get CP
+    int32 addCP(lua_State*);                // Add CP
     int32 delCP(lua_State*);                // Delete CP
 
     int32 getSeals(lua_State*);             // Get Seals (beastman seals, etc)
     int32 addSeals(lua_State*);             // Add Seals
     int32 delSeals(lua_State*);             // Delete Seals
 
-    int32 getValorPoint(lua_State*);        // Get valor point (tabs)
-    int32 addValorPoint(lua_State*);        // Add valor point (tabs)
-    int32 delValorPoint(lua_State*);        // Delete valor point (tabs)
-
-    int32 getScylds(lua_State*);            // Get Scylds
-    int32 addScylds(lua_State*);            // Add Scylds
-    int32 delScylds(lua_State*);            // Delete Scylds
-
-    int32 getCinders(lua_State*);           // Get Cinders
-    int32 addCinders(lua_State*);           // Add Cinders
-    int32 delCinders(lua_State*);           // Delete Cinders
-
-    int32 getFewell(lua_State*);            // Get Fewell (fire fewell, etc)
-    int32 addFewell(lua_State*);            // Add Fewell
-    int32 delFewell(lua_State*);            // Delete Fewell
-
-    int32 getImperialStanding(lua_State*);  // Get imperial standing
-    int32 addImperialStanding(lua_State*);  // Add imperial standing
-    int32 delImperialStanding(lua_State*);  // Delete imperial standing
-
-    int32 getAssaultPoint(lua_State*);      // Get imperial standing
-    int32 addAssaultPoint(lua_State*);      // Add imperial standing
-    int32 delAssaultPoint(lua_State*);      // Delete imperial standing
-
-    int32 getAlliedNotes(lua_State*);       // Get Allied Notes
-    int32 addAlliedNotes(lua_State*);       // Add Allied Notes
-    int32 delAlliedNotes(lua_State*);       // Delete Allied Notes
-
-    int32 getZeni(lua_State*);              // Get Zeni
-    int32 addZeni(lua_State*);              // Add Zeni
-    int32 delZeni(lua_State*);              // Delete Zeni
+    int32 getAssaultPoint(lua_State*);      // Get points for an assault area
+    int32 addAssaultPoint(lua_State*);      // Add points for an assault area
+    int32 delAssaultPoint(lua_State*);      // Delete points for an assault area
 
     int32 isJailed(lua_State *L);           // Is the player jailed
-
-    int32 getCruor(lua_State*);             // Get Cruor
-    int32 addCruor(lua_State*);             // Add Cruor
-    int32 delCruor(lua_State*);             // Delete Cruor
-    int32 getResistanceCredit(lua_State*);  // Get Resistance Credits
-    int32 addResistanceCredit(lua_State*);  // Add Resistance Credits
-    int32 delResistanceCredit(lua_State*);  // Delete Resistance Credits
-    int32 getDominionNote(lua_State*);      // Get Dominion Notes
-    int32 addDominionNote(lua_State*);      // Add Dominion Notes
-    int32 delDominionNote(lua_State*);      // Delete Dominion Notes
-
-    int32 getTags(lua_State*);              // Get Imperial ID tags (Assault)
-    int32 addTags(lua_State*);              // Add Imperial ID tags (Assault)
-    int32 delTags(lua_State*);              // Delete Imperial ID tags (Assault)
-
-    int32 getTstone(lua_State*);            // Get Traverser Stone Stock
-    int32 addTstone(lua_State*);            // Add Traverser Stone Stock
-    int32 delTstone(lua_State*);            // Delete Traverser Stone Stock
-
-    int32 getVstone(lua_State*);            // Get Voidstone Stock
-    int32 addVstone(lua_State*);            // Add Voidstone Stock
-    int32 delVstone(lua_State*);            // Delete Voidstone Stock
 
     int32 addNationTeleport(lua_State*);     // Add new teleport: addNationTeleport(nation,number)
     int32 getNationTeleport(lua_State*);     // Get teleport you can use by nation: getNationTeleport(nation)
 
     int32 checkDistance(lua_State*);           // Check Distacnce and returns distance number
-    int32 checkBaseExp(lua_State*);            // Check if Monster gives base expirence
+    int32 getBaseExp(lua_State*);
     int32 checkSoloPartyAlliance(lua_State*);  // Check if Player is in Party or Alliance 0=Solo 1=Party 2=Alliance
     int32 checkExpPoints(lua_State*);          // Exp points penalty for Player vs Max High Player Gap in party
     int32 checkFovAllianceAllowed(lua_State*); // checks the map config, 1 if alliance is allowed to farm Fov pages
@@ -504,11 +455,13 @@ public:
     int32 isPet(lua_State*);
 
     int32 injectActionPacket(lua_State*);   // ONLY FOR DEBUGGING. Injects an action packet with the specified params.
+    int32 setMobFlags(lua_State*);          // Used to manipulate the mob's flags for testing.
 
     int32 setDelay(lua_State*);             // sets a mobs weapon delay
     int32 setDamage(lua_State*);            // sets a mobs weapon damage
-    int32 castSpell(lua_State*);            // forces a mob to cast a spell (parameter = spellid, otherwise picks a spell from its list)
-    int32 useMobAbility(lua_State*);        // forces a mob to use a mobability (parameter = mobid, otherwise picks a spell from its list)
+    int32 castSpell(lua_State*);            // forces a mob to cast a spell (parameter = spell ID, otherwise picks a spell from its list)
+    int32 useMobAbility(lua_State*);        // forces a mob to use a mobability (parameter = skill ID)
+    int32 useJobAbility(lua_State*);        // forces a job ability use (players/pets only)
     int32 actionQueueEmpty(lua_State*);     // returns whether the action queue is empty or not
     int32 actionQueueAbility(lua_State*);   // returns whether the action is from the action queue or not
 
@@ -518,13 +471,16 @@ public:
     int32 SetMobSkillAttack(lua_State*);      // enable/disable using mobskills as regular attacks
     int32 updateTarget(lua_State*);           // Force mob to update target from enmity container (ie after updateEnmity)
 
-    int32 getExtraVar(lua_State*);
-    int32 setExtraVar(lua_State*);
+    int32 getLocalVar(lua_State*);
+    int32 setLocalVar(lua_State*);
+    int32 resetLocalVars(lua_State*);
+
     int32 setSpellList(lua_State*);
+    int32 hasSpellList(lua_State*);
+    int32 hasPreventActionEffect(lua_State*);
 
     int32 hasValidJugPetItem(lua_State*);
     int32 getTarget(lua_State*);
-    int32 setBattleSubTarget(lua_State*);
     int32 hasTPMoves(lua_State*);
     int32 getMaster(lua_State*);
 
@@ -570,6 +526,7 @@ public:
     int32 hideName(lua_State* L);
     int32 untargetable(lua_State* L);
     int32 hideHP(lua_State* L);
+    int32 hideModel(lua_State* L);
     int32 breathDmgTaken(lua_State* L);
     int32 magicDmgTaken(lua_State* L);
     int32 physicalDmgTaken(lua_State* L);
@@ -577,7 +534,9 @@ public:
 
     int32 entityVisualPacket(lua_State* L);
     int32 entityAnimationPacket(lua_State* L);
+    int32 getPartyLeader(lua_State* L);
     int32 getParty(lua_State* L);
+    int32 getAlliance(lua_State* L);
     int32 messageText(lua_State* L);
     int32 instanceEntry(lua_State* L);
     int32 getInstance(lua_State* L);
@@ -587,10 +546,52 @@ public:
     int32 spawn(lua_State* L);
     int32 getCurrentAction(lua_State* L);
     int32 getAllegiance(lua_State* L);
-	int32 stun(lua_State* L);
+    int32 setAllegiance(lua_State* L);
+    int32 stun(lua_State* L);
     int32 weaknessTrigger(lua_State* L);
     int32 setBehaviour(lua_State* L);
     int32 getBehaviour(lua_State* L);
+    int32 reloadParty(lua_State* L);
+    int32 getModelId(lua_State* L);
+    int32 setModelId(lua_State* L);
+    int32 setTrueDetection(lua_State* L);
+    int32 instantiateMob(lua_State* L);
+
+    int32 getActiveManeuvers(lua_State*);
+    int32 removeOldestManeuver(lua_State*);
+    int32 removeAllManeuvers(lua_State*);
+    int32 addBurden(lua_State* L);
+
+    int32 setElevator(lua_State* L);
+
+    int32 storeWithPorterMoogle(lua_State* L);
+    int32 getRetrievableItemsForSlip(lua_State *L);
+    int32 retrieveItemFromSlip(lua_State *L);
+
+    int32 getILvlMacc(lua_State *L);
+
+    int32 getConfrontationEffect(lua_State* L);
+    int32 copyConfrontationEffect(lua_State* L);    // copy confrontation effect, param = targetEntity:getShortID()
+
+    int32 queue(lua_State* L);
+    int32 timer(lua_State* L); //execute lua closure after some time
+
+    int32 addListener(lua_State* L);
+    int32 removeListener(lua_State* L);
+    int32 triggerListener(lua_State* L);
+
+    int32 removeAmmo(lua_State* L);
+    int32 takeWeaponskillDamage(lua_State* L);
+
+    int32 setEquipBlock(lua_State* L);
+    int32 setStatDebilitation(lua_State* L);
+    int32 unequipItem(lua_State* L);
+    int32 recalculateStats(lua_State* L);
+    int32 checkImbuedItems(lua_State* L);
+
+    int32 getNearbyEntities(lua_State* L);
+    int32 getAutomatonFrame(lua_State* L);
+    int32 getAutomatonHead(lua_State* L);
 };
 
 #endif

@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Sacrificial Chamber
--- NPC:  Sable-tongued_Gonberry
+--  MOB: Sable-tongued_Gonberry
 -- BCNM: Jungle Boogymen
 -----------------------------------
 
@@ -8,7 +8,7 @@
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
@@ -22,12 +22,12 @@ end;
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 
-	local kills = killer:getVar("EVERYONES_GRUDGE_KILLS");
-	
-	if(kills < 480) then
-		killer:setVar("EVERYONES_GRUDGE_KILLS",kills + 1);
-	end	
-	
+    local kills = ally:getVar("EVERYONES_GRUDGE_KILLS");
+
+    if (kills < 480) then
+        ally:setVar("EVERYONES_GRUDGE_KILLS",kills + 1);
+    end
+
 end;

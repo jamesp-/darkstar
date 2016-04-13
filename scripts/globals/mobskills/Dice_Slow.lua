@@ -6,15 +6,15 @@
 --
 --
 ---------------------------------------------
-require("/scripts/globals/settings");
-require("/scripts/globals/status");
-require("/scripts/globals/monstertpmoves");
+require("scripts/globals/settings");
+require("scripts/globals/status");
+require("scripts/globals/monstertpmoves");
 ---------------------------------------------
-function OnMobSkillCheck(target,mob,skill)
+function onMobSkillCheck(target,mob,skill)
     return 0;
 end;
 
-function OnMobWeaponSkill(target, mob, skill)
+function onMobWeaponSkill(target, mob, skill)
     local slowed = false;
     local sleeped = false;
 
@@ -22,9 +22,9 @@ function OnMobWeaponSkill(target, mob, skill)
     sleeped = MobStatusEffectMove(mob, target, EFFECT_SLEEP_I, 1, 0, 30);
 
     skill:setMsg(MSG_ENFEEB_IS);
-    if(sleeped) then
+    if (sleeped) then
         return EFFECT_SLEEP_I;
-    elseif(slowed) then
+    elseif (slowed) then
         return EFFECT_SLOW;
     else
         skill:setMsg(MSG_MISS); -- no effect

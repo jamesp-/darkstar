@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Dynamis Bastok
--- NPC:  Vanguard Vindicator
+--  MOB: Vanguard Vindicator
 -----------------------------------
 
 require("scripts/globals/dynamis");
@@ -9,7 +9,7 @@ require("scripts/globals/dynamis");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
@@ -23,11 +23,11 @@ end;
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob,killer)
-	
-	if(mob:getID() == 17539300 and alreadyReceived(killer,7) == false) then
-		killer:addTimeToDynamis(10);
-		addDynamisList(killer,64);
-	end
-	
+function onMobDeath(mob,killer,ally)
+
+    if (mob:getID() == 17539300 and alreadyReceived(killer,7) == false) then
+        ally:addTimeToDynamis(10);
+        addDynamisList(killer,64);
+    end
+
 end;

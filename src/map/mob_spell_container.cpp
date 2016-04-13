@@ -1,7 +1,7 @@
  /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 
 #include "mob_spell_container.h"
 #include "utils/battleutils.h"
+#include "status_effect_container.h"
+#include "mob_modifier.h"
 
 CMobSpellContainer::CMobSpellContainer(CMobEntity* PMob)
 {
@@ -45,7 +47,7 @@ void CMobSpellContainer::AddSpell(int16 spellId)
   // get spell
   CSpell* spell = spell::GetSpell(spellId);
 
-  if(spell == NULL){
+  if(spell == nullptr){
     ShowDebug("Missing spellID = %d, given to mob. Check spell_list.sql\n", spellId);
     return;
   }
@@ -108,7 +110,7 @@ bool CMobSpellContainer::HasMPSpells()
 int16 CMobSpellContainer::GetAggroSpell()
 {
   // high chance to return ga spell
-  if(HasGaSpells() && rand()%100 <= m_PMob->getMobMod(MOBMOD_GA_CHANCE)){
+    if (HasGaSpells() && dsprand::GetRandomNumber(100) <= m_PMob->getMobMod(MOBMOD_GA_CHANCE)){
     return GetGaSpell();
   }
 
@@ -120,12 +122,12 @@ int16 CMobSpellContainer::GetSpell()
 {
   int16 spellId = -1;
   // prioritize curing if health low enough
-  if(HasHealSpells() && m_PMob->GetHPP() <= m_PMob->getMobMod(MOBMOD_HP_HEAL_CHANCE) && rand()%100 < m_PMob->getMobMod(MOBMOD_HEAL_CHANCE)){
+  if (HasHealSpells() && m_PMob->GetHPP() <= m_PMob->getMobMod(MOBMOD_HP_HEAL_CHANCE) && dsprand::GetRandomNumber(100) < m_PMob->getMobMod(MOBMOD_HEAL_CHANCE)){
     return GetHealSpell();
   }
 
   // almost always use na if I can
-  if(HasNaSpells() && rand()%100 < m_PMob->getMobMod(MOBMOD_NA_CHANCE)){
+  if (HasNaSpells() && dsprand::GetRandomNumber(100) < m_PMob->getMobMod(MOBMOD_NA_CHANCE)){
     // will return -1 if no proper na spell exists
     spellId = GetNaSpell();
     if(spellId > -1){
@@ -134,44 +136,67 @@ int16 CMobSpellContainer::GetSpell()
   }
 
   // try ga spell
-  if(HasGaSpells() && rand()%100 < m_PMob->getMobMod(MOBMOD_GA_CHANCE)){
+  if (HasGaSpells() && dsprand::GetRandomNumber(100) < m_PMob->getMobMod(MOBMOD_GA_CHANCE)){
     return GetGaSpell();
   }
 
-  if(HasBuffSpells() && rand()%100 < m_PMob->getMobMod(MOBMOD_BUFF_CHANCE)){
+  if (HasBuffSpells() && dsprand::GetRandomNumber(100) < m_PMob->getMobMod(MOBMOD_BUFF_CHANCE)){
     return GetBuffSpell();
   }
 
-  // try damage spell
-  return GetDamageSpell();
+  // Grab whatever spell can be found
+  // starting from damage spell
+  if(HasDamageSpells())
+  {
+      // try damage spell
+      return GetDamageSpell();
+  }
+
+  if(HasBuffSpells())
+  {
+      return GetBuffSpell();
+  }
+
+  if(HasGaSpells())
+  {
+      return GetGaSpell();
+  }
+
+  if(HasHealSpells())
+  {
+      return GetHealSpell();
+  }
+
+  // Got no spells to use
+  return -1;
 }
 
 int16 CMobSpellContainer::GetGaSpell()
 {
   if(m_gaList.empty()) return -1;
 
-  return m_gaList[rand()%m_gaList.size()];
+  return m_gaList[dsprand::GetRandomNumber(m_gaList.size())];
 }
 
 int16 CMobSpellContainer::GetDamageSpell()
 {
   if(m_damageList.empty()) return -1;
 
-  return m_damageList[rand()%m_damageList.size()];
+  return m_damageList[dsprand::GetRandomNumber(m_damageList.size())];
 }
 
 int16 CMobSpellContainer::GetBuffSpell()
 {
   if(m_buffList.empty()) return -1;
 
-  return m_buffList[rand()%m_buffList.size()];
+  return m_buffList[dsprand::GetRandomNumber(m_buffList.size())];
 }
 
 int16 CMobSpellContainer::GetHealSpell()
 {
   if(m_PMob->m_EcoSystem == SYSTEM_UNDEAD || m_healList.empty()) return -1;
 
-  return m_healList[rand()%m_healList.size()];
+  return m_healList[dsprand::GetRandomNumber(m_healList.size())];
 }
 
 int16 CMobSpellContainer::GetNaSpell()

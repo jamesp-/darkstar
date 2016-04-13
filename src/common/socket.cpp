@@ -1,4 +1,4 @@
-// Copyright (c) 2010-2014 Darkstar Dev Teams
+// Copyright (c) 2010-2015 Darkstar Dev Teams
 
 #include "../common/cbasetypes.h"
 #include "../common/mmo.h"
@@ -7,6 +7,7 @@
 #include "../common/showmsg.h"
 #include "../common/strlib.h"
 #include "../common/taskmgr.h"
+#include "../common/kernel.h"
 
 #include "socket.h"
 
@@ -420,7 +421,7 @@ uint16 ntows(uint16 netshort)
 typedef struct _connect_history {
 	struct _connect_history* next;
 	uint32 ip;
-	uint32 tick;
+	time_point tick;
 	int count;
 	unsigned ddos : 1;
 } ConnectHistory;
@@ -444,8 +445,8 @@ static int access_denynum  = 0;
 static int access_debug    = 0;
 //--
 static int ddos_count      = 10;
-static unsigned int ddos_interval   = 3*1000;
-static unsigned int ddos_autoreset  = 10*60*1000;
+static duration ddos_interval = 3s;
+static duration ddos_autoreset = 10min;
 
 /// Connection history, an array of linked lists.
 /// The array's index for any ip is ip&0xFFFF
@@ -539,9 +540,9 @@ static int connect_check_(uint32 ip)
 			if( hist->ddos )
 			{// flagged as DDoS
 				return (connect_ok == 2 ? 1 : 0);
-			} else if( DIFF_TICK(gettick(),hist->tick) < ddos_interval )
+			} else if( (server_clock::now() - hist->tick) < ddos_interval )
 			{// connection within ddos_interval
-				hist->tick = gettick();
+                hist->tick = server_clock::now();
 				if( hist->count++ >= ddos_count )
 				{// DDoS attack detected
 					hist->ddos = 1;
@@ -551,7 +552,7 @@ static int connect_check_(uint32 ip)
 				return connect_ok;
 			} else
 			{// not within ddos_interval, clear data
-				hist->tick  = gettick();
+                hist->tick = server_clock::now();
 				hist->count = 0;
 				return connect_ok;
 			}
@@ -562,7 +563,7 @@ static int connect_check_(uint32 ip)
 	CREATE(hist, ConnectHistory, 1);
 	memset(hist, 0, sizeof(ConnectHistory));
 	hist->ip   = ip;
-	hist->tick = gettick();
+    hist->tick = server_clock::now();
 	hist->next = connect_history[ip&0xFFFF];
 	connect_history[ip&0xFFFF] = hist;
 	return connect_ok;
@@ -570,7 +571,7 @@ static int connect_check_(uint32 ip)
 
 /// Timer function.
 /// Deletes old connection history records.
-static int connect_check_clear(uint32 tick,CTaskMgr::CTask* PTask)
+static int connect_check_clear(time_point tick,CTaskMgr::CTask* PTask)
 {
 	int i;
 	int clear = 0;
@@ -583,8 +584,8 @@ static int connect_check_clear(uint32 tick,CTaskMgr::CTask* PTask)
 		prev_hist = &root;
 		root.next = hist = connect_history[i];
 		while( hist ){
-			if( (!hist->ddos && DIFF_TICK(tick,hist->tick) > ddos_interval*3) ||
-					(hist->ddos && DIFF_TICK(tick,hist->tick) > ddos_autoreset) )
+			if( (!hist->ddos && (tick - hist->tick) > ddos_interval*3) ||
+					(hist->ddos && (tick - hist->tick) > ddos_autoreset) )
 			{// Remove connection history
 				prev_hist->next = hist->next;
 				aFree(hist);
@@ -807,7 +808,7 @@ int32 makeListenBind_tcp(uint32 ip, uint16 port,RecvFunc connect_client)
 	if( fd == -1 )
 	{
 		ShowError("make_listen_bind: socket creation failed (code %d)!\n", sErrno);
-		exit(EXIT_FAILURE);
+		do_final(EXIT_FAILURE);
 	}
 	if( fd == 0 )
 	{// reserved
@@ -832,12 +833,12 @@ int32 makeListenBind_tcp(uint32 ip, uint16 port,RecvFunc connect_client)
 	result = sBind(fd, (struct sockaddr*)&server_address, sizeof(server_address));
 	if( result == SOCKET_ERROR ) {
 		ShowError("make_listen_bind: bind failed (socket #%d, code %d)!\n", fd, sErrno);
-		exit(EXIT_FAILURE);
+        do_final(EXIT_FAILURE);
 	}
 	result = sListen(fd,5);
 	if( result == SOCKET_ERROR ) {
 		ShowError("make_listen_bind: listen failed (socket #%d, code %d)!\n", fd, sErrno);
-		exit(EXIT_FAILURE);
+        do_final(EXIT_FAILURE);
 	}
 
 	if(fd_max <= fd) fd_max = fd + 1;
@@ -855,12 +856,12 @@ int32 realloc_fifo(int32 fd, uint32 rfifo_size, uint32 wfifo_size)
 		return 0;
 
 	if( session[fd]->max_rdata != rfifo_size && session[fd]->rdata_size < rfifo_size) {
-		RECREATE(session[fd]->rdata, unsigned char, rfifo_size);
+		RECREATE(session[fd]->rdata, char, rfifo_size);
 		session[fd]->max_rdata  = rfifo_size;
 	}
 
 	if( session[fd]->max_wdata != wfifo_size && session[fd]->wdata_size < wfifo_size) {
-		RECREATE(session[fd]->wdata, unsigned char, wfifo_size);
+		RECREATE(session[fd]->wdata, char, wfifo_size);
 		session[fd]->max_wdata  = wfifo_size;
 	}
 	return 0;
@@ -886,7 +887,7 @@ int32 realloc_writefifo(int32 fd, size_t addition)
 	else // no change
 		return 0;
 
-	RECREATE(session[fd]->wdata, unsigned char, newsize);
+	RECREATE(session[fd]->wdata, char, newsize);
 	session[fd]->max_wdata  = newsize;
 
 	return 0;
@@ -906,7 +907,7 @@ int32 WFIFOSET(int32 fd, size_t len)
 		ShowFatalError("WFIFOSET: Write Buffer Overflow. Connection %d (%d.%d.%d.%d) has written %u bytes on a %u/%u bytes buffer.\n", fd, CONVIP(ip), (unsigned int)len, (unsigned int)s->wdata_size, (unsigned int)s->max_wdata);
 		ShowDebug("Likely command that caused it: 0x%x\n", (*(uint16*)(s->wdata + s->wdata_size)));
 		// no other chance, make a better fifo model
-		exit(EXIT_FAILURE);
+        do_final(EXIT_FAILURE);
 	}
 
 	if( len > 0xFFFF )
@@ -914,7 +915,7 @@ int32 WFIFOSET(int32 fd, size_t len)
 		// dynamic packets allow up to UINT16_MAX bytes (<packet_id>.W <packet_len>.W ...)
 		// all known fixed-size packets are within this limit, so use the same limit
 		ShowFatalError("WFIFOSET: Packet 0x%x is too big. (len=%u, max=%u)\n", (*(uint16*)(s->wdata + s->wdata_size)), (unsigned int)len, 0xFFFF);
-		exit(EXIT_FAILURE);
+        do_final(EXIT_FAILURE);
 	}
 
 	if( !s->flag.server && s->wdata_size+len > WFIFO_MAX )
@@ -1006,11 +1007,11 @@ int socket_config_read(const char* cfgName)
 				ShowError("socket_config_read: Invalid ip or ip range '%s'!\n", line);
 		}
 		else if (!strcmpi(w1,"ddos_interval"))
-			ddos_interval = atoi(w2);
+			ddos_interval = std::chrono::milliseconds(atoi(w2));
 		else if (!strcmpi(w1,"ddos_count"))
 			ddos_count = atoi(w2);
 		else if (!strcmpi(w1,"ddos_autoreset"))
-			ddos_autoreset = atoi(w2);
+			ddos_autoreset = std::chrono::milliseconds(atoi(w2));
 		else if (!strcmpi(w1,"debug"))
 			access_debug = config_switch(w2);
 #endif
@@ -1036,7 +1037,7 @@ void socket_init_tcp(void)
 #ifndef MINICORE
 	// Delete old connection history every 5 minutes
 	memset(connect_history, 0, sizeof(connect_history));
-	CTaskMgr::getInstance()->AddTask("connect_check_clear",gettick()+1000,NULL,CTaskMgr::TASK_INTERVAL,connect_check_clear,5*60*1000);
+	CTaskMgr::getInstance()->AddTask("connect_check_clear",server_clock::now()+1s,NULL,CTaskMgr::TASK_INTERVAL,connect_check_clear,5min);
 
 #endif
 }
@@ -1102,8 +1103,8 @@ void set_eof(int32 fd)
 int create_session(int fd, RecvFunc func_recv, SendFunc func_send, ParseFunc func_parse)
 {
 	CREATE(session[fd], struct socket_data, 1);
-	CREATE(session[fd]->rdata, unsigned char, RFIFO_SIZE);
-	CREATE(session[fd]->wdata, unsigned char, WFIFO_SIZE);
+	CREATE(session[fd]->rdata, char, RFIFO_SIZE);
+	CREATE(session[fd]->wdata, char, WFIFO_SIZE);
 
 	session[fd]->max_rdata  = RFIFO_SIZE;
 	session[fd]->max_wdata  = WFIFO_SIZE;
@@ -1158,7 +1159,7 @@ int32 makeBind_udp(uint32 ip, uint16 port)
 	if( fd == -1 )
 	{
 		ShowError("make_listen_bind: socket creation failed (code %d)!\n", sErrno);
-		exit(EXIT_FAILURE);
+        do_final(EXIT_FAILURE);
 	}
 	if( fd == 0 )
 	{// reserved
@@ -1181,7 +1182,7 @@ int32 makeBind_udp(uint32 ip, uint16 port)
 	if( result == SOCKET_ERROR ) 
     {
 		ShowError("make_listen_bind: bind failed (socket #%d, code %d)!\n", fd, sErrno);
-		exit(EXIT_FAILURE);
+        do_final(EXIT_FAILURE);
 	}
 
 	if(fd_max <= fd) fd_max = fd + 1;

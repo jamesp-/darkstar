@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Arrapago Reef
--- NPC:  Medusa
+--  MOB: Medusa
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,23 +9,23 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobEngaged Action
 -----------------------------------
 
-function OnMobEngaged(mob,target)
-	
-	SpawnMob(16998869,180):updateEnmity(target);
-	SpawnMob(16998870,180):updateEnmity(target);
-	
+function onMobEngaged(mob,target)
+
+    SpawnMob(16998869,180):updateEnmity(target);
+    SpawnMob(16998870,180):updateEnmity(target);
+
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
+function onMobDeath(mob, killer, ally)
 end;

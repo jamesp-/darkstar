@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -199,7 +199,7 @@ int32 Sql_Ping(Sql_t* self)
 
 // @private
 
-static int32 Sql_P_KeepaliveTimer(uint32 tick,CTaskMgr::CTask* PTask)
+static int32 Sql_P_KeepaliveTimer(time_point tick,CTaskMgr::CTask* PTask)
 {
 	Sql_t* self = (Sql_t*)PTask->m_data;
 	ShowInfo("Pinging SQL server to keep connection alive...\n");
@@ -231,7 +231,7 @@ int32 Sql_Keepalive(Sql_t* self)
 	}
 	// establish keepalive
 	ping_interval = timeout - 30; // 30-second reserve
-	CTaskMgr::getInstance()->AddTask("Sql_P_KeepAliveTimer",gettick()+ping_interval*1000,self,CTaskMgr::TASK_INTERVAL,Sql_P_KeepaliveTimer,ping_interval*1000);
+	CTaskMgr::getInstance()->AddTask("Sql_P_KeepAliveTimer",server_clock::now()+std::chrono::seconds(ping_interval),self,CTaskMgr::TASK_INTERVAL,Sql_P_KeepaliveTimer,std::chrono::seconds(ping_interval));
 	return 0;
 }
 
@@ -295,12 +295,14 @@ int32 Sql_QueryV(Sql_t* self, const char* query, va_list args)
 	if( mysql_real_query(&self->handle, StringBuf_Value(&self->buf), (uint32)StringBuf_Length(&self->buf)) )
 	{
 		ShowSQL("DB error - %s\n", mysql_error(&self->handle));
+        ShowSQL("Query: %s\n", StringBuf_Value(&self->buf));
 		return SQL_ERROR;
 	}
 	self->result = mysql_store_result(&self->handle);
 	if( mysql_errno(&self->handle) != 0 )
 	{
 		ShowSQL("DB error - %s\n", mysql_error(&self->handle));
+        ShowSQL("Query: %s\n", StringBuf_Value(&self->buf));
 		return SQL_ERROR;
 	}
 	return SQL_SUCCESS;

@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Chamber of Oracles
--- NPC:  Triarius V-VIII
+--  MOB: Triarius V-VIII
 -- Zilart 6 Fight
 -----------------------------------
 
@@ -8,12 +8,12 @@
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
+function onMobDeath(mob,killer,ally)
 end;

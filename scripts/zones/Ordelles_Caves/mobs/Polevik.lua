@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Ordelles Caves
--- NPC:  Polevik
+--  MOB: Polevik
 -- Involved In Quest: Dark Puppet
 -- @pos -51 0.1 3 193
 -----------------------------------
@@ -9,18 +9,18 @@
 -- onMobSpawn
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
+function onMobDeath(mob, killer, ally)
 
-	if(killer:getVar("sharpeningTheSwordCS") == 3) then
-		killer:setVar("PolevikKilled",1);
-		killer:setVar("Polevik_Timer",os.time());
-	end
+    if (ally:getVar("sharpeningTheSwordCS") == 3) then
+        ally:setVar("PolevikKilled",1);
+        ally:setVar("Polevik_Timer",os.time());
+    end
 
 end;

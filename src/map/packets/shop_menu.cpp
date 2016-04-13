@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,12 +25,12 @@
 
 #include "shop_menu.h"
 #include "../entities/charentity.h"
-
+#include "../trade_container.h"
 
 CShopMenuPacket::CShopMenuPacket(CCharEntity * PChar) 
 {
 	this->type = 0x3E;
 	this->size = 0x04;
 
-	WBUFB(data,(0x04)-4) = PChar->Container->getItemsCount();
+	WBUFB(data,(0x04)) = PChar->Container->getItemsCount();
 }

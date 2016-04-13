@@ -1,14 +1,19 @@
 -----------------------------------
 -- Area: Waughroon Shrine
--- NPC:  Ku'Jhu Graniteskin
+--  MOB: Ku'Jhu Graniteskin
 -- BCNM mob in Bastok mission 7-2.
 -----------------------------------
 
 -----------------------------------
 -- onMobSpawn Action
 -----------------------------------
-function OnMobSpawn(mob)
+
+function onMobSpawn(mob)
 end;
 
-function OnMobDeath(mob, killer)
+-----------------------------------
+-- onMobDeath Action
+-----------------------------------
+
+function onMobDeath(mob, killer, ally)
 end;

@@ -1,7 +1,7 @@
 ﻿/*
 ===========================================================================
 
-  Copyright (c) 2010-2014 Darkstar Dev Teams
+  Copyright (c) 2010-2015 Darkstar Dev Teams
 
   This program is free software: you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -38,22 +38,13 @@ enum RECASTTYPE
 };
 #define MAX_RECASTTPE_SIZE   4
 
-struct Recast_t 
+struct Recast_t
 {
     uint16     ID;
-    uint32     TimeStamp;
+    time_t     TimeStamp;
     uint32     RecastTime;
     uint32     chargeTime;
     uint8      maxCharges;
-
-    Recast_t()
-    {
-        ID = 0;
-        TimeStamp = 0;
-        RecastTime = 0;
-        chargeTime = 0;
-        maxCharges = 0;
-    }
 };
 
 /************************************************************************
@@ -64,21 +55,23 @@ struct Recast_t
 
 class CCharEntity;
 
-typedef std::vector<Recast_t*> RecastList_t;
+typedef std::vector<Recast_t> RecastList_t;
 
 class CRecastContainer
 {
     public:
 
-    void Check(uint32 tick);
+    void Check();
 
     void Del(RECASTTYPE type);
     void Del(RECASTTYPE type, uint16 id);
 	void DeleteByIndex(RECASTTYPE type, uint8 index);
     bool Has(RECASTTYPE type, uint16 id);
-    bool HasRecast(RECASTTYPE type, uint16 id);
+    bool HasRecast(RECASTTYPE type, uint16 id, uint32 recast);
     void Add(RECASTTYPE type, uint16 id, uint32 duration, uint32 chargeTime = 0, uint8 maxCharges = 0);
+    Recast_t* Load(RECASTTYPE type, uint16 id, uint32 duration, uint32 chargeTime = 0, uint8 maxCharges = 0);
     void ResetAbilities();
+    void ChangeJob();
 
     RecastList_t* GetRecastList(RECASTTYPE type);
     Recast_t*     GetRecast(RECASTTYPE type, uint16 id);

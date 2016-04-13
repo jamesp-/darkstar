@@ -1,6 +1,6 @@
 -----------------------------------
 -- Area: Waughroon Shrine
--- NPC:  Black Dragon
+--  MOB: Black Dragon
 -- Mission 2-3 BCNM Fight
 -----------------------------------
 
@@ -10,13 +10,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath Action
 -----------------------------------
 
-function onMobDeath(mob,killer)
-	killer:addTitle(BLACK_DRAGON_SLAYER);
+function onMobDeath(mob,killer,ally)
+    ally:addTitle(BLACK_DRAGON_SLAYER);
 end;

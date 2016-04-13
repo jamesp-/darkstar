@@ -1,6 +1,6 @@
 -----------------------------------
--- Area: 
--- NPC:  Bloodtear_Baldurf
+-- Area: Nyzul Isle
+--  NM:  Bloodtear_Baldurf
 -----------------------------------
 
 require("scripts/globals/titles");
@@ -9,13 +9,13 @@ require("scripts/globals/titles");
 -- onMobSpawn Action
 -----------------------------------
 
-function OnMobSpawn(mob)
+function onMobSpawn(mob)
 end;
 
 -----------------------------------
 -- onMobDeath
 -----------------------------------
 
-function onMobDeath(mob, killer)
-	killer:addTitle(THE_HORNSPLITTER);
+function onMobDeath(mob, killer, ally)
+    ally:addTitle(THE_HORNSPLITTER);
 end;
